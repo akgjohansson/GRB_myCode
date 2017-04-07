@@ -91,7 +91,7 @@ class userOptions:
         #Dynamics options
         self.reverseShock = False            #Include a reverse shock component?
         self.exponential_outflow = True        #Ejecta density distribution exponentially (True) or constant (False)?
-        self.opticalDepth = False           #Take synchrotron self-absorption optical depth into account? True: yes
+        self.opticalDepth = True           #Take synchrotron self-absorption optical depth into account? True: yes
         self.fixedRSFSratio = False          #Fixed ratio between the microphysical coefficients esilone,epsilonp,epsilonB and p of the reverse shock and the forward shock?
         self.fixed_epsilon = True           #Use a fix radiative loss parameter epsilon_rad (see Johansson et al. 2016)?
 

@@ -124,7 +124,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
 
     chi2 = 0.
-    timeGrid = 100   #How tight the lightcurve grid should be when runOption=='LC'
+    timeGrid = 1000   #How tight the lightcurve grid should be when runOption=='LC'
     timeGridSigma = 400
 
 
@@ -634,6 +634,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     PprimTot = PRSprimTemp
  
                 F[rimI] = -np.trapz(PprimTot * phiInter  ,  Phi) * distance_factor
+
 
                 if UseOp.runOption == 'LC' and not UseOp.createMock:
                     if not Plot_Exceptions.FS_only and not Plot_Exceptions.RS_only: ### Plot as usual
