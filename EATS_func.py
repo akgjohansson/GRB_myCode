@@ -73,21 +73,39 @@ def alphanu_func(nu , num , nuc , fast_cooling , p):
     import numpy as np
     alpha_out = np.zeros(len(nu))  ###Allocating space
     if fast_cooling:
-        nu_less_nuc = np.where(nu<=nuc)
-        nuc_less_nu_less_num = np.where((nuc<nu)&(nu<=num))
-        num_less_nu = np.where(num<nu)
+        if len(nu) == 1:
+            if nu<=nuc:
+                alpha_out = (nu/nuc)**(-5/3.)
+            if (nuc < nu) and (nu <= num):
+                alpha_out = (nu/nuc)**(-3)
+            if num<nu:
+                alpha_out = (num/nuc)**(-3) * (nu/num)**(-(p+5)/2)
+
+        else:
+            nu_less_nuc = np.where(nu<=nuc)
+            nuc_less_nu_less_num = np.where((nuc<nu)&(nu<=num))
+            num_less_nu = np.where(num<nu)
         
-        alpha_out[nu_less_nuc] = (nu[nu_less_nuc]/nuc[nu_less_nuc])**(-5/3.)
-        alpha_out[nuc_less_nu_less_num] = (nu[nuc_less_nu_less_num]/nuc[nuc_less_nu_less_num])**(-3)
-        alpha_out[num_less_nu] = (num[num_less_nu]/nuc[num_less_nu])**(-3) * (nu[num_less_nu]/num[num_less_nu])**(-(p+5)/2)
+            alpha_out[nu_less_nuc] = (nu[nu_less_nuc]/nuc[nu_less_nuc])**(-5/3.)
+            alpha_out[nuc_less_nu_less_num] = (nu[nuc_less_nu_less_num]/nuc[nuc_less_nu_less_num])**(-3)
+            alpha_out[num_less_nu] = (num[num_less_nu]/nuc[num_less_nu])**(-3) * (nu[num_less_nu]/num[num_less_nu])**(-(p+5)/2)
 
     else:
-        nu_less_num = np.where(nu<=num)
-        num_less_nu_less_nuc = np.where((num<nu)&(nu<=nuc))
-        nuc_less_nu = np.where(nuc<nu)
+        if len(nu) == 1:
+            if nu<=num:
+                alpha_out = (nu/num)**(-5/3.)
+            if (num<nu) and (nu<=nuc):
+                alpha_out = (nu/num)**(-(p+4)/2)
+            if nuc<nu:
+                alpha_out = (nuc/num)**(-(p+4)/2) * (nu/nuc)**(-(p+5)/2)
 
-        alpha_out[nu_less_num] = (nu[nu_less_num]/num[nu_less_num])**(-5/3.)
-        alpha_out[num_less_nu_less_nuc] = (nu[num_less_nu_less_nuc]/num[num_less_nu_less_nuc])**(-(p+4)/2)
-        alpha_out[nuc_less_nu] = (nuc[nuc_less_nu]/num[nuc_less_nu])**(-(p+4)/2) * (nu[nuc_less_nu]/nuc[nuc_less_nu])**(-(p+5)/2)
+        else:
+            nu_less_num = np.where(nu<=num)
+            num_less_nu_less_nuc = np.where((num<nu)&(nu<=nuc))
+            nuc_less_nu = np.where(nuc<nu)
+
+            alpha_out[nu_less_num] = (nu[nu_less_num]/num[nu_less_num])**(-5/3.)
+            alpha_out[num_less_nu_less_nuc] = (nu[num_less_nu_less_nuc]/num[num_less_nu_less_nuc])**(-(p+4)/2)
+            alpha_out[nuc_less_nu] = (nuc[nuc_less_nu]/num[nuc_less_nu])**(-(p+4)/2) * (nu[nuc_less_nu]/nuc[nuc_less_nu])**(-(p+5)/2)
     
     return alpha_out
