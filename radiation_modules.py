@@ -127,28 +127,39 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
         alphanu[1:-1][where_fast_cooling] = alpha0F[where_fast_cooling] * alphanu_func(nuPrim[where_fast_cooling] , Rad.numRS[where_fast_cooling] , Rad.nucRS[where_fast_cooling], True , ModVar.pRS)
         alphanu[1:-1][where_slow_cooling] = alpha0S[where_slow_cooling] * alphanu_func(nuPrim[where_slow_cooling] , Rad.numRS[where_slow_cooling] , Rad.nucRS[where_slow_cooling], False , ModVar.pRS)
         ### front of EATS
-        alphanu[-1] = alpha0F_front * alphanu_func(nuPrim_front , InterWeights.numRS_front , InterWeights.nucRS_front , slow_cooling_front==False , ModVar.pRS)
-        alphanu[0] = alpha0F_edge * alphanu_func(nuPrim_edge , InterWeights.numRS_edge , InterWeights.nucRS_edge , slow_cooling_edge==False , ModVar.pRS)
+        alphanu[-1] = alpha0F_front * alphanu_func(InterWeights.nuPrim_front , InterWeights.numRS_front , InterWeights.nucRS_front , slow_cooling_front==False , ModVar.pRS)
+        alphanu[0] = alpha0F_edge * alphanu_func(InterWeights.nuPrim_edge , InterWeights.numRS_edge , InterWeights.nucRS_edge , slow_cooling_edge==False , ModVar.pRS)
 
-        ### edge of EATS
-        alpha
         return alphanu * Dyn.thickness_RS[indeces] / 2
 
 
     else:
         where_fast_cooling = np.where(Rad.nuc[indeces] < Rad.num[indeces])
         where_slow_cooling = np.where(Rad.num[indeces] <= Rad.nuc[indeces])
+        slow_cooling_edge = InterWeights.numRS <= InterWeights.nucRS_edge
+        slow_cooling_front = InterWeights.numRS <= InterWeights.nucRS_front
+
         alpha0Ffactor = 11.7 * absCon.phipF * absCon.XpF**(-3) * NatCon.qe / NatCon.mp
         alpha0Sfactor = 7.8 * absCon.phipS * absCon.XpS**(-(4+ModVar.p)/2.) * (ModVar.p+2)*(ModVar.p-1)* NatCon.qe / NatCon.mp / (ModVar.p+2/3.)
 
         rhoPrim = 4 * Dyn.rho[indeces] * Dyn.Gamma[indeces]
+        rhoPrim_edge = 4 * InterWeights.rho_edge * InterWeights.Gamma_edge
+        rhoPrim_front = 4 * InterWeights.rho_front * InterWeights.Gamma_front
 
         alpha0F = alpha0Ffactor * rhoPrim / Dyn.B[indeces] * Dyn.gammac[indeces] ** (-5)
+        alpha0F_front = alpha0Ffactor * rhoPrim_front / InterWeights.B_front * InterWeights.gammac_front ** (-5)
+        alpha0F_edge = alpha0Ffactor * rhoPrim_edge / InterWeights.B_edge * InterWeights.gammac_edge ** (-5)
+
         alpha0S = alpha0Sfactor * rhoPrim * Dyn.gamma_min[indeces] ** (-5) / Dyn.B[indeces] 
+        alpha0S_edge = alpha0Sfactor * rhoPrim_edge * InterWeights.gamma_min_edge ** (-5) / InterWeights.B_edge 
+        alpha0S_front = alpha0Sfactor * rhoPrim_front * InterWeights.gamma_min_front ** (-5) / InterWeights.B_front 
 
         alphanu = np.zeros(len(indeces))
         alphanu[where_fast_cooling] = alpha0F[where_fast_cooling] * alphanu_func(nuPrim[where_fast_cooling] , Rad.num[where_fast_cooling] , Rad.nuc[where_fast_cooling], True , ModVar.p)
         alphanu[where_slow_cooling] = alpha0S[where_slow_cooling] * alphanu_func(nuPrim[where_slow_cooling] , Rad.num[where_slow_cooling] , Rad.nuc[where_slow_cooling], False , ModVar.p)
+        ### Front of EATS
+        ### Fortsätt här
+        alphanu[0] = alpha0F_edge * alphanu_func(InterWeights.nuPrim[where_slow_cooling] , Rad.num[where_slow_cooling] , Rad.nuc[where_slow_cooling], slow_cooling_edge==False , ModVar.p)
 
         return alphanu * Dyn.thickness_FS[indeces] / 2
 
@@ -195,9 +206,9 @@ class weights:
             self.Phi_edge = np.pi/2
         else:
             self.Phi_edge = np.arccos(cosPhi_edge)
+            
+        self.nuPrim_edge = onePzFreq * self.Gamma_edge * (1-self.beta_edge * np.cos(self.Phi_edge))
         
-        self.nuPrim_edge = onePzFreq * InterWeights.Gamma_edge * (1-self.beta_edge * np.cos(self.Phi_edge))
-
         if UseOp.reverseShock:
             self.BRS_edge = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'edge')
             self.numRS_edge = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'edge')
@@ -206,19 +217,21 @@ class weights:
             self.gammac_RS_edge = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'edge')
             self.gamma_min_RS_edge = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'edge')
         ### Interpolating dynamics values of the LoS part of the EATS
-
+        
         self.R_front = self.interpolator(Dyn.R[first_index] , Dyn.R[first_index+1] , 'front')
         self.tburst_front = self.interpolator(Dyn.tburst[first_index] , Dyn.tburst[first_index+1] , 'front')
         self.tobs_front = self.interpolator(Dyn.tobs[first_index] , Dyn.tobs[first_index+1] , 'front')
         self.Gamma_front = self.interpolator(Dyn.Gamma[first_index] , Dyn.Gamma[first_index+1] , 'front')
         self.beta_front = self.interpolator(Dyn.beta[first_index] , Dyn.beta[first_index+1] , 'front')
         self.theta_front = self.interpolator(Dyn.theta[first_index] , Dyn.theta[first_index+1] , 'front')
+        
         self.B_front = self.interpolator(Dyn.B[first_index] , Dyn.B[first_index+1] , 'front')
         self.rho_front = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'front')
         self.num_front = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'front')
         self.nuc_front = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'front')
-        self.gammac_front = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'front)'
+        self.gammac_front = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'front')
         self.gamma_min_front = self.interpolator(Dyn.gamma_min[last_index] , Dyn.gamma_min[last_index+1] , 'front')
+        self.nuPrim_front = onePzFreq * self.Gamma_front * (1-self.beta_front)
         if UseOp.reverseShock:
             self.rho4_front = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'front')            
             self.BRS_front = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'front')

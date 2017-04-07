@@ -314,8 +314,8 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 Phi[1:-1] = np.arccos(NatCon.c/Dyn.R[intermid_ind]*(Dyn.tburst[intermid_ind] - tobsRed[rimI]/(1+ModVar.z)))
 
                 Phi[0] = InterWeights.Phi_edge
-                Phi[-1] = NatCon.c/InterWeights.R_front*(InterWeights.tburst_front - tobsRed[rimI] / (1+ModVar.z))
-                #Phi[-1] = 0.
+                #Phi[-1] = #NatCon.c/InterWeights.R_front*(InterWeights.tburst_front - tobsRed[rimI] / (1+ModVar.z))
+                Phi[-1] = 0. ### Per definition
 
 [0])
 
@@ -368,9 +368,9 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
                 nuPrim = np.zeros(EATSrings)
                 nuPrim[1:-1] = onePzFreq * Dyn.Gamma[intermid_ind] * (1-Dyn.beta[intermid_ind] * np.cos(Phi[1:-1]))
-                nuPrim[0] = onePzFreq * InterWeights.Gamma_edge * (1-InterWeights.beta_edge * np.cos(Phi[0]))
+                nuPrim[0] = InterWeights.nuPrim_edge
 
-                nuPrim[-1] = onePzFreq * InterWeights.Gamma_front * (1-InterWeights.beta_front * np.cos(Phi[-1]))
+                nuPrim[-1] = InterWeights.nuPrim_front
 
                 PprimTemp = np.zeros(EATSrings)
                 PprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi[1:-1] , intermid_ind , Kappas, False , True)
