@@ -376,12 +376,11 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 PprimTemp[0] , PprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi , intermid_ind , Kappas, False , False , InterWeights , last_index , first_index)
 
                 if UseOp.opticalDepth:
-                    tauFS = np.zeros(EATSrings)
-                    tauFS[1:-1] = self_absorption(Dyn , ModVar , selfAbs , Rad , NatCon , InterWeights , nuPrim , intermid_ind , False)
+                    tauFS = self_absorption(Dyn , ModVar , selfAbs , Rad , NatCon , InterWeights , nuPrim , intermid_ind , False)
                     
                     
                     PprimTemp *= (1-np.exp(-tauFS))/tauFS
-
+                raw_input(tauFS)
                 if UseOp.reverseShock:
 
                     where_angleInd_RS = np.where((intermid_ind >= RS_elements_lower) & ( intermid_ind < (RS_elements_upper-1)))
@@ -391,8 +390,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     PRSprimTemp[where_RS] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True)
 
                     if opticalDepth:
-                        tauRS = np.zeros(EATSrings_RS)
-                        tauRS[1:-1] = tauFS + self_absorption(Dyn , ModVar , selfAbsRS , Rad , NatCon , InterWeights , nuPrim[where_RS] , intermid_ind_RS , True)
+                        tauRS = tauFS + self_absorption(Dyn , ModVar , selfAbsRS , Rad , NatCon , InterWeights , nuPrim[where_RS] , intermid_ind_RS , True)
                         PRSprimTemp *= (1-np.exp(-tauRS))/tauRS
 
                     #PRSprimTemp[where_RS] = radiation_function(Dyn , numRS , nucRS , nuPrim , beta , Phi , pRS , PRSmaxF , PRSmaxS)
