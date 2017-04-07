@@ -273,8 +273,8 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 if last_index <= 0:
                     print 'last_index is smaller or equal to 0!!!'
 
-                tobs_behind = (1+ModVar.z)*Dyn.tburst[last_index] - Dyn.R[last_index]*np.cos(total_angle[last_index])/NatCon.c
-                tobs_before = (1+ModVar.z)*Dyn.tburst[last_index+1] - Dyn.R[last_index+1]*np.cos(total_angle[last_index+1])/NatCon.c
+                tobs_behind = (1+ModVar.z)*(Dyn.tburst[last_index] - Dyn.R[last_index]*np.cos(total_angle[last_index])/NatCon.c)
+                tobs_before = (1+ModVar.z)*(Dyn.tburst[last_index+1] - Dyn.R[last_index+1]*np.cos(total_angle[last_index+1])/NatCon.c)
                         
 
                 
@@ -375,12 +375,19 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 PprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi[1:-1] , intermid_ind , Kappas, False , True)
                 PprimTemp[0] , PprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi , intermid_ind , Kappas, False , False , InterWeights , last_index , first_index)
 
+                ### Fortsätt här. Verkar som att problemet inte är i self absorption, men någon annan stans. Obs! inget felmeddelande förräns att programmet kommer till chi2-utvärdering
+
                 if UseOp.opticalDepth:
                     tauFS = self_absorption(Dyn , ModVar , selfAbs , Rad , NatCon , InterWeights , nuPrim , intermid_ind , False)
-                    
-                    
-                    PprimTemp *= (1-np.exp(-tauFS))/tauFS
-                raw_input(tauFS)
+                    tau_factor = np.ones(EATSrings)
+                    high_tauFS = np.where(tauFS > 1e-2)
+                    medium_tauFS = np.where((tauFS<=1e-2) & (tauFS > 1e-8))
+                    tau_factor[high_tauFS] = (1-np.exp(-tauFS[high_tauFS]))/tauFS[high_tauFS]
+                    tau_factor[medium_tauFS] = (tauFS[medium_tauFS] - tauFS[medium_tauFS]**2/2 + tauFS[medium_tauFS]**4/4 - tauFS[medium_tauFS]**6/6)/tauFS[medium_tauFS]
+                    if np.count_nonzero(tau_factor) != EATSrings:
+                        raw_input('hold it!')
+                    ### any lower tau will give tau factor 1
+                    PprimTemp *= tau_factor
                 if UseOp.reverseShock:
 
                     where_angleInd_RS = np.where((intermid_ind >= RS_elements_lower) & ( intermid_ind < (RS_elements_upper-1)))

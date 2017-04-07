@@ -76,9 +76,9 @@ def alphanu_func(nu , num , nuc , fast_cooling , p):
         if len(nu) == 1:
             if nu<=nuc:
                 alpha_out = (nu/nuc)**(-5/3.)
-            if (nuc < nu) and (nu <= num):
+            elif (nuc < nu) and (nu <= num):
                 alpha_out = (nu/nuc)**(-3)
-            if num<nu:
+            elif num<nu:
                 alpha_out = (num/nuc)**(-3) * (nu/num)**(-(p+5)/2)
 
         else:
@@ -94,9 +94,9 @@ def alphanu_func(nu , num , nuc , fast_cooling , p):
         if len(nu) == 1:
             if nu<=num:
                 alpha_out = (nu/num)**(-5/3.)
-            if (num<nu) and (nu<=nuc):
+            elif (num<nu) and (nu<=nuc):
                 alpha_out = (nu/num)**(-(p+4)/2)
-            if nuc<nu:
+            elif nuc<nu:
                 alpha_out = (nuc/num)**(-(p+4)/2) * (nu/nuc)**(-(p+5)/2)
 
         else:

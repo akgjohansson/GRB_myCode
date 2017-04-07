@@ -152,16 +152,6 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
         alpha0F_front = alpha0Ffactor * rhoPrim_front / InterWeights.B_front * InterWeights.gammac_front ** (-5)
         alpha0F_edge = alpha0Ffactor * rhoPrim_edge / InterWeights.B_edge * InterWeights.gammac_edge ** (-5)
 
-        print alpha0F[1]
-        print alpha0F[-2]
-        print alpha0F_front
-        print alpha0F_edge
-        print Dyn.B[indeces]
-        print Dyn.B[indeces[0]-1]
-        print Dyn.B[indeces[-1]+1]
-        print InterWeights.B_edge
-        print InterWeights.B_front
-
         alpha0S = alpha0Sfactor * rhoPrim * Dyn.gamma_min[indeces] ** (-5) / Dyn.B[indeces] 
         alpha0S_edge = alpha0Sfactor * rhoPrim_edge * InterWeights.gamma_min_edge ** (-5) / InterWeights.B_edge 
         alpha0S_front = alpha0Sfactor * rhoPrim_front * InterWeights.gamma_min_front ** (-5) / InterWeights.B_front 
@@ -170,8 +160,15 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
         alphanu[1:-1][where_fast_cooling] = alpha0F[where_fast_cooling] * alphanu_func(nuPrim[where_fast_cooling] , Rad.num[where_fast_cooling] , Rad.nuc[where_fast_cooling], True , ModVar.p)
         alphanu[1:-1][where_slow_cooling] = alpha0S[where_slow_cooling] * alphanu_func(nuPrim[where_slow_cooling] , Rad.num[where_slow_cooling] , Rad.nuc[where_slow_cooling], False , ModVar.p)
 
-        alphanu[0] = alpha0F_edge * alphanu_func(InterWeights.nuPrim_edge , InterWeights.num_edge , InterWeights.nuc_edge, slow_cooling_edge==False , ModVar.p)
-        alphanu[-1] = alpha0F_front * alphanu_func(InterWeights.nuPrim_front , InterWeights.num_front , InterWeights.nuc_front, slow_cooling_front==False , ModVar.p)
+        if slow_cooling_edge:
+            alphanu[0] = alpha0S_edge * alphanu_func(InterWeights.nuPrim_edge , InterWeights.num_edge , InterWeights.nuc_edge, False , ModVar.p)
+        else:
+            alphanu[0] = alpha0F_edge * alphanu_func(InterWeights.nuPrim_edge , InterWeights.num_edge , InterWeights.nuc_edge, True , ModVar.p)
+        if slow_cooling_front:
+            alphanu[-1] = alpha0S_front * alphanu_func(InterWeights.nuPrim_front , InterWeights.num_front , InterWeights.nuc_front, False , ModVar.p)
+        else:
+            alphanu[-1] = alpha0F_front * alphanu_func(InterWeights.nuPrim_front , InterWeights.num_front , InterWeights.nuc_front, True , ModVar.p)
+
 
         thickness = np.zeros(len(indeces)+2)
         thickness[1:-1] = Dyn.thickness_FS[indeces]
@@ -191,7 +188,6 @@ class weights:
         self.frontWeight2 = tobs - Dyn.tobs[first_index]
         self.frontWeight = Dyn.tobs[first_index+1] - Dyn.tobs[first_index]
 
-        ### Fortsätt här: det är något lurt med edgeWeight!
 
         ### Weights to interpolate the edge point of the EATSurface
         self.edgeWeight1 = tobs_before - tobs
@@ -215,12 +211,6 @@ class weights:
         self.theta_edge = self.interpolator(Dyn.theta[last_index] , Dyn.theta[last_index+1] , 'edge')
         self.rho_edge = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'edge')
         self.B_edge = self.interpolator(Dyn.B[last_index] , Dyn.B[last_index+1] , 'edge')
-        print Dyn.B[last_index-1]
-        print Dyn.B[last_index]
-        print Dyn.B[last_index+1]
-        print last_index
-        raw_input(self.B_edge)
-
         self.num_edge = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'edge')
         self.nuc_edge = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'edge')
         self.gammac_edge = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'edge')
