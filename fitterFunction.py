@@ -276,16 +276,15 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 tobs_behind = (1+ModVar.z)*Dyn.tburst[last_index] - Dyn.R[last_index]*np.cos(total_angle[last_index])/NatCon.c
                 tobs_before = (1+ModVar.z)*Dyn.tburst[last_index+1] - Dyn.R[last_index+1]*np.cos(total_angle[last_index+1])/NatCon.c
                         
-                ### Weights for interpolating the front point and the edge point
-                InterWeights = weights(Dyn , tobsRed[rimI] , tobs_behind , tobs_before  , first_index , last_index)
 
-
-
-
-
+                
 
                 ### Now we want to create an array with obs times of all points on the EATS. Then we integrate using trapzoidal rule
                 intermid_ind = np.arange(last_index+1,first_index+1) ### intermediate indeces, ranging from last_index+1 to first_index (all indeces inside the EATS)
+                
+                ### Weights for interpolating the front point and the edge point
+                InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before ,  , first_index , last_index , onePzFreq , Phi)
+                                       
 
                 ### Angle Phi is defined from setting
                 ### tobs = (1+z)*(tburst-R*cos(Phi)/c)
@@ -301,7 +300,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
 
                 EATSrings = len(intermid_ind) + 2 ### Number of points in Dyn class inside EATSurface
-
+                                       
                 ### Same for RS
                 if UseOp.reverseShock:
                     where_RS = np.where(Dyn.tobs[intermid_ind] <= tobs_RS_cutoff) ### Finds what rings on the EATS has an RS counter part.
@@ -311,21 +310,16 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 ### Setting array containing angle from LoS to EATS rings
                 Phi = np.zeros(EATSrings)
                 #if len(Phi) == 2: ### If there are no Dyn points inside the EATS, we have to interpolate the edges
-                    
+                                       
                 Phi[1:-1] = np.arccos(NatCon.c/Dyn.R[intermid_ind]*(Dyn.tburst[intermid_ind] - tobsRed[rimI]/(1+ModVar.z)))
 
-
-
-                ### Setting Phi at the central and outermost ring
-                edge_arccos_value = NatCon.c/InterWeights.R_edge*(InterWeights.tburst_edge - tobsRed[rimI]/(1+ModVar.z)) ### We precalculate this, to avoid bad values in arccos when Phi approaches pi/2
-
-
-                if (edge_arccos_value >= 1) or (edge_arccos_value <= -1):
-                    Phi[0] = np.pi/2
-                else:
-                    Phi[0] = np.arccos(edge_arccos_value)
+                Phi[0] = InterWeights.Phi_edge
                 Phi[-1] = NatCon.c/InterWeights.R_front*(InterWeights.tburst_front - tobsRed[rimI] / (1+ModVar.z))
                 #Phi[-1] = 0.
+
+[0])
+
+
 
                 """
                 if np.sum(Phi < 0) != 0:

@@ -106,16 +106,31 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
 
     if RS:
         where_slow_cooling = np.where(Rad.numRS[indeces] <= Rad.nucRS[indeces])
+        slow_cooling_front = InterWeights.numRS_front <= InterWeights.nucRS_front
+        slow_cooling_edge = InterWeights.numRS_edge <= InterWeights.nucRS_edge
         where_fast_cooling = np.where(Rad.nucRS[indeces] < Rad.numRS[indeces])
         alpha0Sfactor = 7.8 * absCon.phipS * absCon.XpS**(-(4+ModVar.pRS)/2.) * (ModVar.pRS+2)*(ModVar.pRS-1)* NatCon.qe / NatCon.mp / (ModVar.pRS+2/3.)
+
         rhoPrim = 4 * Dyn.rho4[indeces] * Dyn.Gamma[indeces]
+        rhoPrim_front = 4 * InterWeights.rho4_front * InterWeights.Gamma_front
+        rhoPrim_edge = 4 * InterWeights.rho4_edge * InterWeights.Gamma_edge
 
         alpha0F = alpha0Ffactor * rhoPrim / Dyn.BRS[indeces] * Dyn.gammacRS[indeces] ** (-5)
+        alpha0F_front = alpha0Ffactor * rhoPrim_front / InterWeights.BRS_front * InterWeights.gammacRS_front ** (-5)
+        alpha0F_edge = alpha0Ffactor * rhoPrim_edge / InterWeights.BRS_edge * InterWeights.gammacRS_edge ** (-5)
+
         alpha0S = alpha0Sfactor * rhoPrim * Dyn.gamma_min_RS[indeces] ** (-5) / Dyn.BRS[indeces] 
+        alpha0S_front = alpha0Sfactor * rhoPrim_front * InterWeights.gamma_min_RS_front ** (-5) / InterWeights.BRS_front 
+        alpha0S_edge = alpha0Sfactor * rhoPrim_edge * InterWeights.gamma_min_RS_edge ** (-5) / InterWeights.BRS_edge 
 
         alphanu = np.zeros(len(indeces)+2)
         alphanu[1:-1][where_fast_cooling] = alpha0F[where_fast_cooling] * alphanu_func(nuPrim[where_fast_cooling] , Rad.numRS[where_fast_cooling] , Rad.nucRS[where_fast_cooling], True , ModVar.pRS)
         alphanu[1:-1][where_slow_cooling] = alpha0S[where_slow_cooling] * alphanu_func(nuPrim[where_slow_cooling] , Rad.numRS[where_slow_cooling] , Rad.nucRS[where_slow_cooling], False , ModVar.pRS)
+        ### front of EATS
+        alphanu[-1] = alpha0F_front * alphanu_func(nuPrim_front , InterWeights.numRS_front , InterWeights.nucRS_front , slow_cooling_front==False , ModVar.pRS)
+        alphanu[0] = alpha0F_edge * alphanu_func(nuPrim_edge , InterWeights.numRS_edge , InterWeights.nucRS_edge , slow_cooling_edge==False , ModVar.pRS)
+
+        ### edge of EATS
         alpha
         return alphanu * Dyn.thickness_RS[indeces] / 2
 
@@ -139,8 +154,9 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
 
 
 class weights:
-    def __init__(self,Dyn,UseOp,tobs,tobs_behind,tobs_before,first_index,last_index):
+    def __init__(self,Dyn,UseOp,Rad,ModVar,NatCon,tobs,tobs_behind,tobs_before,first_index,last_index,onePzFreq):
          ### Weights to interpolate the center point of the EATSurface
+        import numpy as np
 
         self.frontWeight1 = Dyn.tobs[first_index+1] - tobs
         self.frontWeight2 = tobs - Dyn.tobs[first_index]
@@ -166,11 +182,29 @@ class weights:
         self.Gamma_edge = self.interpolator(Dyn.Gamma[last_index] , Dyn.Gamma[last_index+1] , 'edge')
         self.beta_edge = self.interpolator(Dyn.beta[last_index] , Dyn.beta[last_index+1] , 'edge')
         self.theta_edge = self.interpolator(Dyn.theta[last_index] , Dyn.theta[last_index+1] , 'edge')
+        self.rho_edge = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'edge')
         self.B_edge = self.interpolator(Dyn.B[last_index] , Dyn.B[last_index+1] , 'edge')
+        self.num_edge = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'edge')
+        self.nuc_edge = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'edge')
+        self.gammac_edge = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'edge')
+        self.gamma_min_edge = self.interpolator(Dyn.gamma_min[last_index] , Dyn.gamma_min[last_index+1] , 'edge')
+
+        ### Integration angle Phi
+        cosPhi_edge = NatCon.c/self.R_edge*(self.tburst_edge - tobs / (1+ModVar.z))
+        if (cosPhi_edge >= 1) or (cosPhi_edge <= -1):
+            self.Phi_edge = np.pi/2
+        else:
+            self.Phi_edge = np.arccos(cosPhi_edge)
+        
+        self.nuPrim_edge = onePzFreq * InterWeights.Gamma_edge * (1-self.beta_edge * np.cos(self.Phi_edge))
+
         if UseOp.reverseShock:
             self.BRS_edge = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'edge')
-            
-
+            self.numRS_edge = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'edge')
+            self.nucRS_edge = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'edge')
+            self.rho4_edge = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'edge')            
+            self.gammac_RS_edge = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'edge')
+            self.gamma_min_RS_edge = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'edge')
         ### Interpolating dynamics values of the LoS part of the EATS
 
         self.R_front = self.interpolator(Dyn.R[first_index] , Dyn.R[first_index+1] , 'front')
@@ -180,9 +214,18 @@ class weights:
         self.beta_front = self.interpolator(Dyn.beta[first_index] , Dyn.beta[first_index+1] , 'front')
         self.theta_front = self.interpolator(Dyn.theta[first_index] , Dyn.theta[first_index+1] , 'front')
         self.B_front = self.interpolator(Dyn.B[first_index] , Dyn.B[first_index+1] , 'front')
+        self.rho_front = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'front')
+        self.num_front = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'front')
+        self.nuc_front = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'front')
+        self.gammac_front = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'front)'
+        self.gamma_min_front = self.interpolator(Dyn.gamma_min[last_index] , Dyn.gamma_min[last_index+1] , 'front')
         if UseOp.reverseShock:
+            self.rho4_front = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'front')            
             self.BRS_front = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'front')
-
+            self.numRS_front = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'front')
+            self.nucRS_front = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'front')
+            self.gammac_RS_front = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'front')
+            self.gamma_min_RS_front = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'front')
 
     def interpolator(self,lower,upper,region):
         if region == 'front':
