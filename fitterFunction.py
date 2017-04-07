@@ -283,7 +283,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 intermid_ind = np.arange(last_index+1,first_index+1) ### intermediate indeces, ranging from last_index+1 to first_index (all indeces inside the EATS)
                 
                 ### Weights for interpolating the front point and the edge point
-                InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before ,  , first_index , last_index , onePzFreq , Phi)
+                InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before , first_index , last_index , onePzFreq)
                                        
 
                 ### Angle Phi is defined from setting
@@ -317,7 +317,6 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 #Phi[-1] = #NatCon.c/InterWeights.R_front*(InterWeights.tburst_front - tobsRed[rimI] / (1+ModVar.z))
                 Phi[-1] = 0. ### Per definition
 
-[0])
 
 
 

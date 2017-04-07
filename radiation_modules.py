@@ -136,8 +136,8 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
     else:
         where_fast_cooling = np.where(Rad.nuc[indeces] < Rad.num[indeces])
         where_slow_cooling = np.where(Rad.num[indeces] <= Rad.nuc[indeces])
-        slow_cooling_edge = InterWeights.numRS <= InterWeights.nucRS_edge
-        slow_cooling_front = InterWeights.numRS <= InterWeights.nucRS_front
+        slow_cooling_edge = InterWeights.num_edge <= InterWeights.nuc_edge
+        slow_cooling_front = InterWeights.num_front <= InterWeights.nuc_front
 
         alpha0Ffactor = 11.7 * absCon.phipF * absCon.XpF**(-3) * NatCon.qe / NatCon.mp
         alpha0Sfactor = 7.8 * absCon.phipS * absCon.XpS**(-(4+ModVar.p)/2.) * (ModVar.p+2)*(ModVar.p-1)* NatCon.qe / NatCon.mp / (ModVar.p+2/3.)
@@ -158,8 +158,9 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
         alphanu[where_fast_cooling] = alpha0F[where_fast_cooling] * alphanu_func(nuPrim[where_fast_cooling] , Rad.num[where_fast_cooling] , Rad.nuc[where_fast_cooling], True , ModVar.p)
         alphanu[where_slow_cooling] = alpha0S[where_slow_cooling] * alphanu_func(nuPrim[where_slow_cooling] , Rad.num[where_slow_cooling] , Rad.nuc[where_slow_cooling], False , ModVar.p)
         ### Front of EATS
-        ### Fortsätt här
-        alphanu[0] = alpha0F_edge * alphanu_func(InterWeights.nuPrim[where_slow_cooling] , Rad.num[where_slow_cooling] , Rad.nuc[where_slow_cooling], slow_cooling_edge==False , ModVar.p)
+
+        alphanu[0] = alpha0F_edge * alphanu_func(InterWeights.nuPrim_edge , InterWeights.num_edge , InterWeights.nuc_edge, slow_cooling_edge==False , ModVar.p)
+        alphanu[-1] = alpha0F_front * alphanu_func(InterWeights.nuPrim_front , InterWeights.num_front , InterWeights.nuc_front, slow_cooling_front==False , ModVar.p)
 
         return alphanu * Dyn.thickness_FS[indeces] / 2
 
