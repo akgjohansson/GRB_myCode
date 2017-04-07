@@ -375,7 +375,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 PprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi[1:-1] , intermid_ind , Kappas, False , True)
                 PprimTemp[0] , PprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi , intermid_ind , Kappas, False , False , InterWeights , last_index , first_index)
 
-                ### Fortsätt här. Verkar som att problemet inte är i self absorption, men någon annan stans. Obs! inget felmeddelande förräns att programmet kommer till chi2-utvärdering
+
 
                 if UseOp.opticalDepth:
                     tauFS = self_absorption(Dyn , ModVar , selfAbs , Rad , NatCon , InterWeights , nuPrim , intermid_ind , False)
@@ -632,8 +632,8 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     PprimTot = PprimTemp
                 elif Plot_Exceptions.RS_only:
                     PprimTot = PRSprimTemp
-
-                F[rimI] = np.trapz(PprimTot * phiInter  ,  Phi) * distance_factor
+ 
+                F[rimI] = -np.trapz(PprimTot * phiInter  ,  Phi) * distance_factor
 
                 if UseOp.runOption == 'LC' and not UseOp.createMock:
                     if not Plot_Exceptions.FS_only and not Plot_Exceptions.RS_only: ### Plot as usual
