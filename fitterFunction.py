@@ -634,6 +634,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     PprimTot = PRSprimTemp
  
                 F[rimI] = -np.trapz(PprimTot * phiInter  ,  Phi) * distance_factor
+                ### Negative sign is because integration is reversed on the x-axis (angle axis)
 
 
                 if UseOp.runOption == 'LC' and not UseOp.createMock:
