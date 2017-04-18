@@ -85,7 +85,7 @@ def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas
                 fast_cooling = num > nuc
                 thickness = InterWeights.interpolator(Dyn.m[element]/ ((1.-np.cos(Dyn.theta[element])) * Dyn.Gamma[element]**2*Dyn.rho[element]*Dyn.R[element]**2)  ,  Dyn.m[element+1]/ ((1.-np.cos(Dyn.theta[element+1])) * Dyn.Gamma[element+1]**2*Dyn.rho[element+1]*Dyn.R[element+1]**2) , region,'log') / 8/np.pi
 
-            P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[element]**2 / Dyn.Gamma[element]**3 / (1-Dyn.beta[element]*np.cos(Phi_now))**3  ,  Dyn.R[element+1]**2 / Dyn.Gamma[element+1]**3 / (1-Dyn.beta[element+1]*np.cos(Phi[0]))**3  , region,'log')
+            P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[element]**2 / Dyn.Gamma[element]**3 / (1-Dyn.beta[element]*np.cos(Phi_now))**3  ,  Dyn.R[element+1]**2 / Dyn.Gamma[element+1]**3 / (1-Dyn.beta[element+1]*np.cos(Phi_now))**3  , region,'log')
             if slow_cooling:
                 out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu_now , None , [element] , [] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu_now , None , [element+1] , [] , kappas , RS , True) , region,'log')
             elif fast_cooling:
