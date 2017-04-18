@@ -55,41 +55,41 @@ def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas
         out = np.zeros(2)
         for i , region in enumerate(regions):
             if RS:
-                num = InterWeights.interpolator(Rad.numRS[last_index],Rad.numRS[last_index+1],region)
-                nuc = InterWeights.interpolator(Rad.nucRS[last_index],Rad.nucRS[last_index+1],region)
+                num = InterWeights.interpolator(Rad.numRS[last_index],Rad.numRS[last_index+1],region,'log')
+                nuc = InterWeights.interpolator(Rad.nucRS[last_index],Rad.nucRS[last_index+1],region,'log')
                 slow_cooling = numRS <= nucRS
-                Gamma = InterWeights.interpolator(Dyn.Gamma[last_index],Dyn.Gamma[last_index+1],region)
-                rho = InterWeights.interpolator(Dyn.rho4[last_index],Dyn.rho4[last_index+1],region)
-                rhoprim = 4*InterWeights.interpolator(Dyn.Gamma[last_index]*Dyn.rho4[last_index],Dyn.Gamma[last_index+1]*Dyn.rho4[last_index+1],region)
+                Gamma = InterWeights.interpolator(Dyn.Gamma[last_index],Dyn.Gamma[last_index+1],region,'log')
+                rho = InterWeights.interpolator(Dyn.rho4[last_index],Dyn.rho4[last_index+1],region,'log')
+                rhoprim = 4*InterWeights.interpolator(Dyn.Gamma[last_index]*Dyn.rho4[last_index],Dyn.Gamma[last_index+1]*Dyn.rho4[last_index+1],region,'log')
 
                 fast_cooling = numRS > nucRS
-                thickness = InterWeights.interpolator(Dyn.M3[last_index]/ ((1.-np.cos(Dyn.theta[last_index])) * Dyn.Gamma[last_index]**2*Dyn.rho4[last_index]*Dyn.R[last_index]**2)  ,  Dyn.M3[last_index+1]/ ((1.-np.cos(Dyn.theta[last_index+1])) * Dyn.Gamma[last_index+1]**2*Dyn.rho4[last_index+1]*Dyn.R[last_index+1]**2) , region) / 8/np.pi
+                thickness = InterWeights.interpolator(Dyn.M3[last_index]/ ((1.-np.cos(Dyn.theta[last_index])) * Dyn.Gamma[last_index]**2*Dyn.rho4[last_index]*Dyn.R[last_index]**2)  ,  Dyn.M3[last_index+1]/ ((1.-np.cos(Dyn.theta[last_index+1])) * Dyn.Gamma[last_index+1]**2*Dyn.rho4[last_index+1]*Dyn.R[last_index+1]**2) , region,'log') / 8/np.pi
             
             else:
 
-                num = InterWeights.interpolator(Rad.num[last_index],Rad.num[last_index+1],region)
-                nuc = InterWeights.interpolator(Rad.nuc[last_index],Rad.nuc[last_index+1],region)
+                num = InterWeights.interpolator(Rad.num[last_index],Rad.num[last_index+1],region,'log')
+                nuc = InterWeights.interpolator(Rad.nuc[last_index],Rad.nuc[last_index+1],region,'log')
                 slow_cooling = num <= nuc
-                Gamma = InterWeights.interpolator(Dyn.Gamma[last_index],Dyn.Gamma[last_index+1],region)
-                rho = InterWeights.interpolator(Dyn.rho[last_index],Dyn.rho[last_index+1],region)
-                rhoprim = 4*InterWeights.interpolator(Dyn.Gamma[last_index]*Dyn.rho[last_index],Dyn.Gamma[last_index+1]*Dyn.rho[last_index+1],region)
+                Gamma = InterWeights.interpolator(Dyn.Gamma[last_index],Dyn.Gamma[last_index+1],region,'log')
+                rho = InterWeights.interpolator(Dyn.rho[last_index],Dyn.rho[last_index+1],region,'log')
+                rhoprim = 4*InterWeights.interpolator(Dyn.Gamma[last_index]*Dyn.rho[last_index],Dyn.Gamma[last_index+1]*Dyn.rho[last_index+1],region,'log')
 
                 fast_cooling = num > nuc
-                thickness = InterWeights.interpolator(Dyn.m[last_index]/ ((1.-np.cos(Dyn.theta[last_index])) * Dyn.Gamma[last_index]**2*Dyn.rho[last_index]*Dyn.R[last_index]**2)  ,  Dyn.m[last_index+1]/ ((1.-np.cos(Dyn.theta[last_index+1])) * Dyn.Gamma[last_index+1]**2*Dyn.rho[last_index+1]*Dyn.R[last_index+1]**2) , region) / 8/np.pi
+                thickness = InterWeights.interpolator(Dyn.m[last_index]/ ((1.-np.cos(Dyn.theta[last_index])) * Dyn.Gamma[last_index]**2*Dyn.rho[last_index]*Dyn.R[last_index]**2)  ,  Dyn.m[last_index+1]/ ((1.-np.cos(Dyn.theta[last_index+1])) * Dyn.Gamma[last_index+1]**2*Dyn.rho[last_index+1]*Dyn.R[last_index+1]**2) , region,'log') / 8/np.pi
             if region == 'edge':
-                P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[last_index]**2 / Dyn.Gamma[last_index]**3 / (1-Dyn.beta[last_index]*np.cos(Phi[0]))**3  ,  Dyn.R[last_index+1]**2 / Dyn.Gamma[last_index+1]**3 / (1-Dyn.beta[last_index+1]*np.cos(Phi[0]))**3  , region)
+                P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[last_index]**2 / Dyn.Gamma[last_index]**3 / (1-Dyn.beta[last_index]*np.cos(Phi[0]))**3  ,  Dyn.R[last_index+1]**2 / Dyn.Gamma[last_index+1]**3 / (1-Dyn.beta[last_index+1]*np.cos(Phi[0]))**3  , region,'log')
                 if slow_cooling:
-                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[0] , None , [last_index] , [] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[0] , None , [last_index+1] , [] , kappas , RS , True) , region)
+                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[0] , None , [last_index] , [] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[0] , None , [last_index+1] , [] , kappas , RS , True) , region,'log')
                 elif fast_cooling:
-                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[0] , None , [] , [last_index] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[0] , None , [] , [last_index+1] , kappas , RS , True) , region)
+                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[0] , None , [] , [last_index] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[0] , None , [] , [last_index+1] , kappas , RS , True) , region,'log')
                 else:
                     raise NameError('variable regions is not properly used!')
             elif region == 'front':
-                P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[first_index]**2 / Dyn.Gamma[first_index]**3 / (1-Dyn.beta[first_index]*np.cos(Phi[0]))**3  ,  Dyn.R[first_index+1]**2 / Dyn.Gamma[first_index+1]**3 / (1-Dyn.beta[first_index+1]*np.cos(Phi[-1]))**3  , region)
+                P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[first_index]**2 / Dyn.Gamma[first_index]**3 / (1-Dyn.beta[first_index]*np.cos(Phi[0]))**3  ,  Dyn.R[first_index+1]**2 / Dyn.Gamma[first_index+1]**3 / (1-Dyn.beta[first_index+1]*np.cos(Phi[-1]))**3  , region,'log')
                 if slow_cooling:
-                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[-1] , None , [first_index] , [] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[-1] , None , [first_index+1] , [] , kappas , RS , True) , region)
+                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[-1] , None , [first_index] , [] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[-1] , None , [first_index+1] , [] , kappas , RS , True) , region,'log')
                 elif fast_cooling:
-                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[-1] , None , [] , [first_index] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[-1] , None , [] , [first_index+1] , kappas , RS , True) , region)
+                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[-1] , None , [] , [first_index] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[-1] , None , [] , [first_index+1] , kappas , RS , True) , region,'log')
                 else:
                     raise NameError('variable regions is not properly used!')
         return out
@@ -255,15 +255,15 @@ class weights:
             self.gammac_RS_front = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'front','log')
             self.gamma_min_RS_front = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'front','log')
             self.thickness_RS_front = self.interpolator(Dyn.thickness_RS[last_index] , Dyn.thickness_RS[last_index+1] , 'front','log')
-    def interpolator(self,lower,upper,region,scale='lin'):
+    def interpolator(self,lower,upper,region,scale='log'):
         import numpy as np
         if scale == 'log':
             lower = np.log(lower)
             upper = np.log(upper)
             if region == 'front':
-                return 10**(lower + (upper - lower) * self.front_connector_log)
+                return np.exp(lower + (upper - lower) * self.front_connector_log)
             elif region == 'edge':
-                return 10**(lower + (upper - lower) * self.edge_connector_log)
+                return np.exp(lower + (upper - lower) * self.edge_connector_log)
             else:
                 print region
                 raise NameError('Something wrong! This else should not be entered')
