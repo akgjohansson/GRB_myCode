@@ -56,8 +56,12 @@ def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas
         for i , region in enumerate(regions):
             if region == 'edge':
                 element = last_index
+                nu_now = nu[0]
+                Phi_now = Phi[0]
             else:
                 element = first_index
+                nu_now = nu[-1]
+                Phi_now = Phi[-1]
             if RS:
                 num = InterWeights.interpolator(Rad.numRS[element],Rad.numRS[element+1],region,'log')
                 nuc = InterWeights.interpolator(Rad.nucRS[element],Rad.nucRS[element+1],region,'log')
@@ -80,14 +84,15 @@ def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas
 
                 fast_cooling = num > nuc
                 thickness = InterWeights.interpolator(Dyn.m[element]/ ((1.-np.cos(Dyn.theta[element])) * Dyn.Gamma[element]**2*Dyn.rho[element]*Dyn.R[element]**2)  ,  Dyn.m[element+1]/ ((1.-np.cos(Dyn.theta[element+1])) * Dyn.Gamma[element+1]**2*Dyn.rho[element+1]*Dyn.R[element+1]**2) , region,'log') / 8/np.pi
-            if region == 'edge':
-                P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[last_index]**2 / Dyn.Gamma[last_index]**3 / (1-Dyn.beta[last_index]*np.cos(Phi[0]))**3  ,  Dyn.R[last_index+1]**2 / Dyn.Gamma[last_index+1]**3 / (1-Dyn.beta[last_index+1]*np.cos(Phi[0]))**3  , region,'log')
-                if slow_cooling:
-                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[0] , None , [last_index] , [] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[0] , None , [last_index+1] , [] , kappas , RS , True) , region,'log')
-                elif fast_cooling:
-                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[0] , None , [] , [last_index] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[0] , None , [] , [last_index+1] , kappas , RS , True) , region,'log')
-                else:
-                    raise NameError('variable regions is not properly used!')
+
+            P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[element]**2 / Dyn.Gamma[element]**3 / (1-Dyn.beta[element]*np.cos(Phi_now))**3  ,  Dyn.R[element+1]**2 / Dyn.Gamma[element+1]**3 / (1-Dyn.beta[element+1]*np.cos(Phi[0]))**3  , region,'log')
+            if slow_cooling:
+                out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu_now , None , [element] , [] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu_now , None , [element+1] , [] , kappas , RS , True) , region,'log')
+            elif fast_cooling:
+                out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu_now , None , [] , [element] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu_now , None , [] , [element+1] , kappas , RS , True) , region,'log')
+            else:
+                raise NameError('variable regions is not properly used!')
+            """
             elif region == 'front':
                 P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[first_index]**2 / Dyn.Gamma[first_index]**3 / (1-Dyn.beta[first_index]*np.cos(Phi[0]))**3  ,  Dyn.R[first_index+1]**2 / Dyn.Gamma[first_index+1]**3 / (1-Dyn.beta[first_index+1]*np.cos(Phi[-1]))**3  , region,'log')
                 if slow_cooling:
@@ -96,6 +101,7 @@ def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas
                     out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[-1] , None , [] , [first_index] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[-1] , None , [] , [first_index+1] , kappas , RS , True) , region,'log')
                 else:
                     raise NameError('variable regions is not properly used!')
+            """
         return out
                                                         
 def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim , indeces , RS):
