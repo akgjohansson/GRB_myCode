@@ -184,38 +184,36 @@ class weights:
          ### Weights to interpolate the center point of the EATSurface
         import numpy as np
 
-        self.frontWeight1 = Dyn.tobs[first_index+1] - tobs
-        self.frontWeight2 = tobs - Dyn.tobs[first_index]
-        self.frontWeight = Dyn.tobs[first_index+1] - Dyn.tobs[first_index]
-
+        
+        self.front_connector_lin = (tobs - Dyn.tobs[first_index]) / (Dyn.tobs[first_index+1] - Dyn.tobs[first_index])
+        self.front_connector_log = (np.log(tobs) - np.log(Dyn.tobs[first_index])) / (np.log(Dyn.tobs[first_index+1]) - np.log(Dyn.tobs[first_index]))
 
         ### Weights to interpolate the edge point of the EATSurface
-        self.edgeWeight1 = tobs_before - tobs
-        if self.edgeWeight1 < 0:
+        self.edge_connector_lin = (tobs - tobs_behind) / (tobs_before - tobs_behind)
+        self.edge_connector_log = (np.log(tobs) - np.log(tobs_behind)) / (np.log(tobs_before) - np.log(tobs_behind))
+        if self.edge_connector_lin < 0:
             print 'edgeWeight < 0'
             print self.edgeWeight1
             print tobs_behind
             print tobs_before
             print tburst
             print tobs_before
-        self.edgeWeight2 = tobs - tobs_behind
-        self.edgeWeight = tobs_before - tobs_behind
 
         ### Interpolating dynamics values at the edge
 
-        self.R_edge = self.interpolator(Dyn.R[last_index] , Dyn.R[last_index+1] , 'edge')
-        self.tburst_edge = self.interpolator(Dyn.tburst[last_index] , Dyn.tburst[last_index+1] , 'edge')
-        self.tobs_edge = self.interpolator(Dyn.tobs[last_index] , Dyn.tobs[last_index+1] , 'edge')
-        self.Gamma_edge = self.interpolator(Dyn.Gamma[last_index] , Dyn.Gamma[last_index+1] , 'edge')
-        self.beta_edge = self.interpolator(Dyn.beta[last_index] , Dyn.beta[last_index+1] , 'edge')
-        self.theta_edge = self.interpolator(Dyn.theta[last_index] , Dyn.theta[last_index+1] , 'edge')
-        self.rho_edge = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'edge')
-        self.B_edge = self.interpolator(Dyn.B[last_index] , Dyn.B[last_index+1] , 'edge')
-        self.num_edge = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'edge')
-        self.nuc_edge = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'edge')
-        self.gammac_edge = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'edge')
-        self.gamma_min_edge = self.interpolator(Dyn.gamma_min[last_index] , Dyn.gamma_min[last_index+1] , 'edge')
-        self.thickness_FS_edge = self.interpolator(Dyn.thickness_FS[last_index] , Dyn.thickness_FS[last_index+1] , 'edge')
+        self.R_edge = self.interpolator(Dyn.R[last_index] , Dyn.R[last_index+1] , 'edge','log')
+        self.tburst_edge = self.interpolator(Dyn.tburst[last_index] , Dyn.tburst[last_index+1] , 'edge','log')
+        self.tobs_edge = self.interpolator(Dyn.tobs[last_index] , Dyn.tobs[last_index+1] , 'edge','log')
+        self.Gamma_edge = self.interpolator(Dyn.Gamma[last_index] , Dyn.Gamma[last_index+1] , 'edge','log')
+        self.beta_edge = self.interpolator(Dyn.beta[last_index] , Dyn.beta[last_index+1] , 'edge','log')
+        self.theta_edge = self.interpolator(Dyn.theta[last_index] , Dyn.theta[last_index+1] , 'edge','log')
+        self.rho_edge = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'edge','log')
+        self.B_edge = self.interpolator(Dyn.B[last_index] , Dyn.B[last_index+1] , 'edge','log')
+        self.num_edge = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'edge','log')
+        self.nuc_edge = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'edge','log')
+        self.gammac_edge = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'edge','log')
+        self.gamma_min_edge = self.interpolator(Dyn.gamma_min[last_index] , Dyn.gamma_min[last_index+1] , 'edge','log')
+        self.thickness_FS_edge = self.interpolator(Dyn.thickness_FS[last_index] , Dyn.thickness_FS[last_index+1] , 'edge','log')
         ### Integration angle Phi
         cosPhi_edge = NatCon.c/self.R_edge*(self.tburst_edge - tobs / (1+ModVar.z))
         if (cosPhi_edge >= 1) or (cosPhi_edge <= -1):
@@ -226,45 +224,57 @@ class weights:
         self.nuPrim_edge = onePzFreq * self.Gamma_edge * (1-self.beta_edge * np.cos(self.Phi_edge))
         
         if UseOp.reverseShock:
-            self.BRS_edge = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'edge')
-            self.numRS_edge = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'edge')
-            self.nucRS_edge = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'edge')
-            self.rho4_edge = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'edge')            
-            self.gammac_RS_edge = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'edge')
-            self.gamma_min_RS_edge = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'edge')
-            self.thickness_RS_edge = self.interpolator(Dyn.thickness_RS[last_index] , Dyn.thickness_RS[last_index+1] , 'edge')
+            self.BRS_edge = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'edge','log')
+            self.numRS_edge = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'edge','log')
+            self.nucRS_edge = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'edge','log')
+            self.rho4_edge = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'edge','log')            
+            self.gammac_RS_edge = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'edge','log')
+            self.gamma_min_RS_edge = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'edge','log')
+            self.thickness_RS_edge = self.interpolator(Dyn.thickness_RS[last_index] , Dyn.thickness_RS[last_index+1] , 'edge','log')
         ### Interpolating dynamics values of the LoS part of the EATS
         
-        self.R_front = self.interpolator(Dyn.R[first_index] , Dyn.R[first_index+1] , 'front')
-        self.tburst_front = self.interpolator(Dyn.tburst[first_index] , Dyn.tburst[first_index+1] , 'front')
-        self.tobs_front = self.interpolator(Dyn.tobs[first_index] , Dyn.tobs[first_index+1] , 'front')
-        self.Gamma_front = self.interpolator(Dyn.Gamma[first_index] , Dyn.Gamma[first_index+1] , 'front')
-        self.beta_front = self.interpolator(Dyn.beta[first_index] , Dyn.beta[first_index+1] , 'front')
-        self.theta_front = self.interpolator(Dyn.theta[first_index] , Dyn.theta[first_index+1] , 'front')
-        self.thickness_FS_front = self.interpolator(Dyn.thickness_FS[last_index] , Dyn.thickness_FS[last_index+1] , 'front')
-        self.B_front = self.interpolator(Dyn.B[first_index] , Dyn.B[first_index+1] , 'front')
-        self.rho_front = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'front')
-        self.num_front = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'front')
-        self.nuc_front = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'front')
-        self.gammac_front = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'front')
-        self.gamma_min_front = self.interpolator(Dyn.gamma_min[last_index] , Dyn.gamma_min[last_index+1] , 'front')
+        self.R_front = self.interpolator(Dyn.R[first_index] , Dyn.R[first_index+1] , 'front','log')
+        self.tburst_front = self.interpolator(Dyn.tburst[first_index] , Dyn.tburst[first_index+1] , 'front','log')
+        self.tobs_front = self.interpolator(Dyn.tobs[first_index] , Dyn.tobs[first_index+1] , 'front','log')
+        self.Gamma_front = self.interpolator(Dyn.Gamma[first_index] , Dyn.Gamma[first_index+1] , 'front','log')
+        self.beta_front = self.interpolator(Dyn.beta[first_index] , Dyn.beta[first_index+1] , 'front','log')
+        self.theta_front = self.interpolator(Dyn.theta[first_index] , Dyn.theta[first_index+1] , 'front','log')
+        self.thickness_FS_front = self.interpolator(Dyn.thickness_FS[last_index] , Dyn.thickness_FS[last_index+1] , 'front','log')
+        self.B_front = self.interpolator(Dyn.B[first_index] , Dyn.B[first_index+1] , 'front','log')
+        self.rho_front = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'front','log')
+        self.num_front = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'front','log')
+        self.nuc_front = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'front','log')
+        self.gammac_front = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'front','log')
+        self.gamma_min_front = self.interpolator(Dyn.gamma_min[last_index] , Dyn.gamma_min[last_index+1] , 'front','log')
         self.nuPrim_front = onePzFreq * self.Gamma_front * (1-self.beta_front)
         if UseOp.reverseShock:
-            self.rho4_front = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'front')            
-            self.BRS_front = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'front')
-            self.numRS_front = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'front')
-            self.nucRS_front = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'front')
-            self.gammac_RS_front = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'front')
-            self.gamma_min_RS_front = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'front')
-            self.thickness_RS_front = self.interpolator(Dyn.thickness_RS[last_index] , Dyn.thickness_RS[last_index+1] , 'front')
-    def interpolator(self,lower,upper,region):
-        if region == 'front':
-            return (lower*self.frontWeight1 + upper*self.frontWeight2) / self.frontWeight
-        elif region == 'edge':
-            return (lower*self.edgeWeight1 + upper*self.edgeWeight2) / self.edgeWeight
+            self.rho4_front = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'front','log')            
+            self.BRS_front = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'front','log')
+            self.numRS_front = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'front','log')
+            self.nucRS_front = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'front','log')
+            self.gammac_RS_front = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'front','log')
+            self.gamma_min_RS_front = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'front','log')
+            self.thickness_RS_front = self.interpolator(Dyn.thickness_RS[last_index] , Dyn.thickness_RS[last_index+1] , 'front','log')
+    def interpolator(self,lower,upper,region,scale='lin'):
+        import numpy as np
+        if scale == 'log':
+            lower = np.log(lower)
+            upper = np.log(upper)
+            if region == 'front':
+                return 10**(lower + (upper - lower) * self.front_connector_log)
+            elif region == 'edge':
+                return 10**(lower + (upper - lower) * self.edge_connector_log)
+            else:
+                print region
+                raise NameError('Something wrong! This else should not be entered')
         else:
-            print region
-            raise NameError('Something wrong! This else should not be entered')
+            if region == 'front':
+                return lower + (upper - lower) * self.front_connector_lin
+            elif region == 'edge':
+                return lower + (upper - lower) * self.edge_connector_lin
+            else:
+                print region
+                raise NameError('Something wrong! This else should not be entered')
 
 class flux_allocation:
     def __init__(self,UseOp,nflux,Plot_Exceptions,npoints,freq):
