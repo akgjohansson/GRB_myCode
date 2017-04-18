@@ -375,14 +375,14 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 PprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi[1:-1] , intermid_ind , Kappas, False , True)
                 PprimTemp[0] , PprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi , intermid_ind , Kappas, False , False , InterWeights , last_index , first_index)
 
-                
+                """
                 if tobsRed[rimI] > 1e2:
                     plt.plot(Phi)
                     plt.show()
                     plt.plot(Phi,PprimTemp)
                     plt.yscale('log')
                     plt.show()
-                
+                """
                 if UseOp.opticalDepth:
                     tauFS = self_absorption(Dyn , ModVar , selfAbs , Rad , NatCon , InterWeights , nuPrim , intermid_ind , False)
                     tau_factor = np.ones(EATSrings)
