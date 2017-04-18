@@ -637,7 +637,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 elif Plot_Exceptions.RS_only:
                     PprimTot = PRSprimTemp
  
-                F[rimI] = -np.trapz(PprimTot * phiInter  ,  Phi) * distance_factor
+                F[rimI] = np.trapz(PprimTot * phiInter  ,  np.cos(Phi)) * distance_factor
                 ### Negative sign is because integration is reversed on the x-axis (angle axis)
 
 
