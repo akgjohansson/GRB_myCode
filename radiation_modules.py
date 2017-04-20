@@ -134,8 +134,8 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
         alpha0S_edge = alpha0Sfactor * rhoPrim_edge * InterWeights.gamma_min_RS_edge ** (-5) / InterWeights.BRS_edge 
 
         alphanu = np.zeros(len(indeces)+2)
-        alphanu[1:-1][where_fast_cooling] = alpha0F[where_fast_cooling] * alphanu_func(nuPrim[where_fast_cooling] , Rad.numRS[where_fast_cooling] , Rad.nucRS[where_fast_cooling], True , ModVar.pRS)
-        alphanu[1:-1][where_slow_cooling] = alpha0S[where_slow_cooling] * alphanu_func(nuPrim[where_slow_cooling] , Rad.numRS[where_slow_cooling] , Rad.nucRS[where_slow_cooling], False , ModVar.pRS)
+        alphanu[1:-1][where_fast_cooling] = alpha0F[where_fast_cooling] * alphanu_func(nuPrim[where_fast_cooling] , Rad.numRS[indeces][where_fast_cooling] , Rad.nucRS[indeces][where_fast_cooling], True , ModVar.pRS)
+        alphanu[1:-1][where_slow_cooling] = alpha0S[where_slow_cooling] * alphanu_func(nuPrim[where_slow_cooling] , Rad.numRS[indeces][where_slow_cooling] , Rad.nucRS[indeces][where_slow_cooling], False , ModVar.pRS)
         ### front of EATS
         alphanu[-1] = alpha0F_front * alphanu_func(InterWeights.nuPrim_front , InterWeights.numRS_front , InterWeights.nucRS_front , slow_cooling_front==False , ModVar.pRS)
         alphanu[0] = alpha0F_edge * alphanu_func(InterWeights.nuPrim_edge , InterWeights.numRS_edge , InterWeights.nucRS_edge , slow_cooling_edge==False , ModVar.pRS)
@@ -167,8 +167,8 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
         alpha0S_front = alpha0Sfactor * rhoPrim_front * InterWeights.gamma_min_front ** (-5) / InterWeights.B_front 
 
         alphanu = np.zeros(len(indeces)+2)
-        alphanu[1:-1][where_fast_cooling] = alpha0F[where_fast_cooling] * alphanu_func(nuPrim[where_fast_cooling] , Rad.num[where_fast_cooling] , Rad.nuc[where_fast_cooling], True , ModVar.p)
-        alphanu[1:-1][where_slow_cooling] = alpha0S[where_slow_cooling] * alphanu_func(nuPrim[where_slow_cooling] , Rad.num[where_slow_cooling] , Rad.nuc[where_slow_cooling], False , ModVar.p)
+        alphanu[1:-1][where_fast_cooling] = alpha0F[where_fast_cooling] * alphanu_func(nuPrim[where_fast_cooling] , Rad.num[indeces][where_fast_cooling] , Rad.nuc[indeces][where_fast_cooling], True , ModVar.p)
+        alphanu[1:-1][where_slow_cooling] = alpha0S[where_slow_cooling] * alphanu_func(nuPrim[where_slow_cooling] , Rad.num[indeces][where_slow_cooling] , Rad.nuc[indeces][where_slow_cooling], False , ModVar.p)
 
         if slow_cooling_edge:
             alphanu[0] = alpha0S_edge * alphanu_func(InterWeights.nuPrim_edge , InterWeights.num_edge , InterWeights.nuc_edge, False , ModVar.p)
@@ -184,7 +184,7 @@ def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim
         thickness[1:-1] = Dyn.thickness_FS[indeces]
         thickness[0] = InterWeights.thickness_FS_edge
         thickness[-1] = InterWeights.thickness_FS_front
-
+        
 
     return alphanu * thickness / 2
 
@@ -217,7 +217,7 @@ class weights:
         self.Gamma_edge = self.interpolator(Dyn.Gamma[last_index] , Dyn.Gamma[last_index+1] , 'edge','log')
         self.beta_edge = self.interpolator(Dyn.beta[last_index] , Dyn.beta[last_index+1] , 'edge','log')
         self.theta_edge = self.interpolator(Dyn.theta[last_index] , Dyn.theta[last_index+1] , 'edge','log')
-        self.rho_edge = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'edge','log')
+        self.rho_edge = self.interpolator(Dyn.rho[last_index] , Dyn.rho[last_index+1] , 'edge','log')
         self.B_edge = self.interpolator(Dyn.B[last_index] , Dyn.B[last_index+1] , 'edge','log')
         self.num_edge = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'edge','log')
         self.nuc_edge = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'edge','log')
@@ -237,7 +237,7 @@ class weights:
             self.BRS_edge = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'edge','log')
             self.numRS_edge = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'edge','log')
             self.nucRS_edge = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'edge','log')
-            self.rho4_edge = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'edge','log')            
+            self.rho4_edge = self.interpolator(Dyn.rho4[last_index] , Dyn.rho4[last_index+1] , 'edge','log')            
             self.gammac_RS_edge = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'edge','log')
             self.gamma_min_RS_edge = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'edge','log')
             self.thickness_RS_edge = self.interpolator(Dyn.thickness_RS[last_index] , Dyn.thickness_RS[last_index+1] , 'edge','log')
@@ -249,22 +249,22 @@ class weights:
         self.Gamma_front = self.interpolator(Dyn.Gamma[first_index] , Dyn.Gamma[first_index+1] , 'front','log')
         self.beta_front = self.interpolator(Dyn.beta[first_index] , Dyn.beta[first_index+1] , 'front','log')
         self.theta_front = self.interpolator(Dyn.theta[first_index] , Dyn.theta[first_index+1] , 'front','log')
-        self.thickness_FS_front = self.interpolator(Dyn.thickness_FS[last_index] , Dyn.thickness_FS[last_index+1] , 'front','log')
+        self.thickness_FS_front = self.interpolator(Dyn.thickness_FS[first_index] , Dyn.thickness_FS[first_index+1] , 'front','log')
         self.B_front = self.interpolator(Dyn.B[first_index] , Dyn.B[first_index+1] , 'front','log')
         self.rho_front = self.interpolator(Dyn.rho[first_index] , Dyn.rho[first_index+1] , 'front','log')
-        self.num_front = self.interpolator(Rad.num[last_index] , Rad.num[last_index+1] , 'front','log')
-        self.nuc_front = self.interpolator(Rad.nuc[last_index] , Rad.nuc[last_index+1] , 'front','log')
-        self.gammac_front = self.interpolator(Dyn.gammac[last_index] , Dyn.gammac[last_index+1] , 'front','log')
-        self.gamma_min_front = self.interpolator(Dyn.gamma_min[last_index] , Dyn.gamma_min[last_index+1] , 'front','log')
+        self.num_front = self.interpolator(Rad.num[first_index] , Rad.num[first_index+1] , 'front','log')
+        self.nuc_front = self.interpolator(Rad.nuc[first_index] , Rad.nuc[first_index+1] , 'front','log')
+        self.gammac_front = self.interpolator(Dyn.gammac[first_index] , Dyn.gammac[first_index+1] , 'front','log')
+        self.gamma_min_front = self.interpolator(Dyn.gamma_min[first_index] , Dyn.gamma_min[first_index+1] , 'front','log')
         self.nuPrim_front = onePzFreq * self.Gamma_front * (1-self.beta_front)
         if UseOp.reverseShock:
             self.rho4_front = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'front','log')            
-            self.BRS_front = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'front','log')
-            self.numRS_front = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'front','log')
-            self.nucRS_front = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'front','log')
-            self.gammac_RS_front = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'front','log')
-            self.gamma_min_RS_front = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'front','log')
-            self.thickness_RS_front = self.interpolator(Dyn.thickness_RS[last_index] , Dyn.thickness_RS[last_index+1] , 'front','log')
+            self.BRS_front = self.interpolator(Dyn.BRS[first_index] , Dyn.BRS[first_index+1] , 'front','log')
+            self.numRS_front = self.interpolator(Rad.numRS[first_index] , Rad.numRS[first_index+1] , 'front','log')
+            self.nucRS_front = self.interpolator(Rad.nucRS[first_index] , Rad.nucRS[first_index+1] , 'front','log')
+            self.gammac_RS_front = self.interpolator(Dyn.gammac_RS[first_index] , Dyn.gammac_RS[first_index+1] , 'front','log')
+            self.gamma_min_RS_front = self.interpolator(Dyn.gamma_min_RS[first_index] , Dyn.gamma_min_RS[first_index+1] , 'front','log')
+            self.thickness_RS_front = self.interpolator(Dyn.thickness_RS[first_index] , Dyn.thickness_RS[first_index+1] , 'front','log')
     def interpolator(self,lower,upper,region,scale='log'):
         import numpy as np
         if scale == 'log':
@@ -287,14 +287,12 @@ class weights:
                 raise NameError('Something wrong! This else should not be entered')
 
 class flux_allocation:
-    def __init__(self,UseOp,nflux,Plot_Exceptions,npoints,freq):
+    def __init__(self,UseOp,x,Plot_Exceptions,npoints,freq,y):
         import numpy as np
-        for i in range(nflux):
-            if not Plot_Exceptions.RS_only:
-                exec('self.FFS_%d = np.zeros(npoints)'%i)
-            if not Plot_Exceptions.FS_only:
-                exec('self.FRS_%d = np.zeros(npoints)'%i)
-            exec('self.name_%d = \'%s\''%(i,freq[i]))
+        self.FFS = np.zeros([x,y])
+        if UseOp.reverseShock:
+            self.FRS = np.zeros([x,y])
+        self.Ftotal = np.zeros([x,y])
 
 
 class exception_class:

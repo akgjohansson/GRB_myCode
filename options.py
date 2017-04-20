@@ -21,7 +21,7 @@ class model_variables:
         self.p = 2.1  #Synchrotron emission power law
         self.logt0 = -1. #Time between R=0 and prompt time   (logarithmic)
         self.theta0 = np.pi / 180. * 5       #Opening angle
-        self.alpha =  np.pi / 180. * 1          #Off-axis angle
+        self.alpha =  np.pi / 180. * 0          #Off-axis angle
         self.z = 1.62         #Redshift
         self.tprompt_log = 3.         #Duration time of prompt phase. Needed for the reverse shock. Input time is observer frame, the module returns the progenitor frame time. Note from 29/1 -14
         self.pRS = 2.05          #Ratio between fixed reverse shock and forward shock microphysical ceofficients. Assumes coeffs of forward shock to set coeffs of reverse shock. If you want to use this, set fixedRSFSratio = TRUE in beginning of mainFit.py.

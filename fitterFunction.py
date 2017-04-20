@@ -9,6 +9,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
     from EATS_func import alphanu_func
     from EATS_func import kappa_constants
     import warnings
+    import os
     from radiation_modules import radiation_function
     from useful_modules import cgs_constants
     from radiation_modules import rad_var
@@ -176,7 +177,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
     #tobsRim = (1+z) * (Dyn.tburst - Dyn.R * np.cos(upperRimLim) / c)     # Observing time at the rim for each radial point. Will use this in setting EATS grid. Note from 9/12 -13
 
     if UseOp.runOption=='LC' and not UseOp.createMock:
-        Flux = flux_allocation(UseOp,iterationLength,Plot_Exceptions,timeGrid,freq)
+        Flux = flux_allocation(UseOp,iterationLength,Plot_Exceptions,timeGrid,freq,timeGrid)
 
     for nuIte in range(iterationLength):     #Loop over all input frequencies or time steps
 
@@ -300,7 +301,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
 
                 EATSrings = len(intermid_ind) + 2 ### Number of points in Dyn class inside EATSurface
-                                       
+
                 ### Same for RS
                 if UseOp.reverseShock:
                     where_RS = np.where(Dyn.tobs[intermid_ind] <= tobs_RS_cutoff) ### Finds what rings on the EATS has an RS counter part.
@@ -375,19 +376,42 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 PprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi[1:-1] , intermid_ind , Kappas, False , True)
                 PprimTemp[0] , PprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi , intermid_ind , Kappas, False , False , InterWeights , last_index , first_index)
 
-
-                if (tobsRed[rimI] > 1e5) and (freqArr < 1e13):
+                """
+                if (tobsRed[rimI] > 86400*84) and (freqArr > 1e13):
+                #if np.count_nonzero(PprimTemp) != EATSrings:
+                    print 'tobs =',tobsRed[rimI]/86400
+                    print Phi
+                    print PprimTemp
+                    print freqArr
+                    file_name = 'plot_dir/%s.txt'%(tobsRed[rimI]/86400)
+                    #np.savetxt(file_name , [Phi , PprimTemp])
                     plt.plot(Phi,PprimTemp)
                     plt.yscale('log')
                     plt.show()
-
+                
+                if len(np.where(PprimTemp<=0)[0]) > 0:
+                    plt.plot(Phi,PprimTemp)
+                    plt.show()
+                """
                 if UseOp.opticalDepth:
                     tauFS = self_absorption(Dyn , ModVar , selfAbs , Rad , NatCon , InterWeights , nuPrim , intermid_ind , False)
+
                     tau_factor = np.ones(EATSrings)
                     high_tauFS = np.where(tauFS > 1e-2)
                     medium_tauFS = np.where((tauFS<=1e-2) & (tauFS > 1e-8))
                     tau_factor[high_tauFS] = (1-np.exp(-tauFS[high_tauFS]))/tauFS[high_tauFS]
                     tau_factor[medium_tauFS] = (tauFS[medium_tauFS] - tauFS[medium_tauFS]**2/2 + tauFS[medium_tauFS]**4/4 - tauFS[medium_tauFS]**6/6)/tauFS[medium_tauFS]
+                    """
+                    if (tobsRed[rimI] > 80*86400) and (freqArr < 1e10):
+                        print tauFS
+                        print high_tauFS
+                        print medium_tauFS
+                        print len(high_tauFS[0]) + len(medium_tauFS[0])
+                        print EATSrings
+                        plt.plot(Phi , tau_factor)
+                        plt.yscale('log')
+                        plt.show()
+                    """
                     if np.count_nonzero(tau_factor) != EATSrings:
                         raw_input('hold it!')
                     ### any lower tau will give tau factor 1
@@ -474,157 +498,6 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
                 
                 
-
-                """
-                if useEATS:
-                    tobsBehind = (1+z) * (Dyn.tburst[intermid_ind] - (Dyn.R[intermid_ind] * cosAngm1 + Dyn.R[intermid_ind]) / c)
-                else:
-                    tobsBehind = (1+z) * (Dyn.tburst[intermid_ind] - Dyn.R[intermid_ind] / c)
-                
-
-
-                phiInter = (theta[angleInd]+ModVar.alpha <= lowerLimit) * 2*np.pi
-                if theta[first_index] + ModVar.alpha <= lowerLimit
-                
-                if ModVar.alpha != 0: #Off-axis
-                    partialRingsInd = np.where((xAng > Dyn.theta[intermid_ind] - ModVar.alpha) & (xAng < Dyn.theta[intermid_ind] + ModVar.alpha))   #Rings crossing the rim. Happens only when ModVar.alpha != 0
-                    offAxisFoV = (Dyn.theta[angleInd[partialRingsInd]]**2 - ModVar.alpha**2 - xAng[partialRingsInd]**2) / (2*ModVar.alpha*xAng[partialRingsInd])
-                    offAxisFoV[np.where(offAxisFoV<-1)] = -1.
-                    if np.sum(offAxisFoV > 1) != 0: offAxisFoV[np.where(offAxisFoV > 1)] = 1.
-                    phiInter[partialRingsInd] = 2*np.pi - 2*np.arccos(offAxisFoV)
-
-
-                #oneDzFreq = freqArr / (1+z)
-                cosAng2 = cosAng**2
-                if F_interpolation:
-                    nuPrimForward = onePzFreq * Dyn.Gamma[intermid_ind+1] * (1-beta[intermid_ind+1] * cosAng)
-
-                    nuPrimBehind = onePzFreq * Dyn.Gamma[intermid_ind] * (1-beta[intermid_ind] * cosAng)
-
-
-                    if useEATS:
-                        tobsFront = (1+z) * (Dyn.tburst[intermid_ind+1] - (Dyn.R[intermid_ind+1] * cosAngm1 + Dyn.R[intermid_ind+1]) / c)
-                    else:
-                        tobsFront = (1+z) * (Dyn.tburst[intermid_ind+1] - Dyn.R[intermid_ind+1] / c)
-
-                    weight,weight1,weight2 = np.log10( tobsFront / tobsBehind )  ,  np.log10( tobsFront / tobsRimNow )  ,  np.log10( tobsRimNow / tobsBehind )
-                    
-
-                    if np.count_nonzero(weight) != len(weight): ### Grid tight enough that tobsFront and tobsBehind are the same. We go about this by choosing the weight to be totally on the first point
-                        where_weight = np.where(weight == 0)
-                        weight[where_weight] = 1.
-                        weight1[where_weight] = 1.
-                        weight2[where_weight] = 0.
-                    #PprimTemp = (Pbehind ** (1-fweight) * Pforward ** (fweight))
-                    #PprimTemp = (Pbehind * weight1 + Pforward * weight2)  /  weight
-                    
-                    PprimTemp , rhoPrimBehind , rhoPrimForward , thickBehind , thickForward = radiation_function(Dyn , num , nuc , nuPrim , beta , Phi , p , PmaxF , PmaxS)
-
-
-
-
-                if UseOp.reverseShock: 
-
-                    PRSprimTemp = np.zeros(surfaceRings)
-
-                    PRSprimTemp[where_angleInd_RS] , rho3primBehind , rho3primForward , thicknessRS_behind , thicknessRS_forward = interpolation_function(Dyn.R , Dyn.Gamma , Dyn.rho4 , Dyn.M3 , numRS , nucRS , nuPrimBehind[where_angleInd_RS] , nuPrimForward[where_angleInd_RS] , Dyn.theta , beta , angleInd_RS , cosAng[where_angleInd_RS] , pRS , PmaxF_RS , PmaxS_RS , weight[where_angleInd_RS] , weight1[where_angleInd_RS] , weight2[where_angleInd_RS])
-
-                """
-                """
-                if UseOp.opticalDepth:
-
-                    tau = self_absorption(num,nuc,alpha0F,alpha0S,nuPrim)
-
-
-                    numCentral = (num[intermid_ind] * weight1 + num[intermid_ind+1] * weight2) / weight
-                    nucCentral = (nuc[intermid_ind] * weight1 + nuc[intermid_ind+1] * weight2) / weight
-                                        
-                    where_slow_cooling = np.where(numCentral <= nucCentral)
-                    where_fast_cooling = np.where(numCentral > nucCentral)
-                    
-                    alpha0Fforward = alpha0Ffactor * rhoPrimForward[where_fast_cooling] / Dyn.B[intermid_ind+1][where_fast_cooling]  *  Dyn.gammac[intermid_ind+1][where_fast_cooling]**(-5)
-                    alpha0Fbehind = alpha0Ffactor * rhoPrimBehind[where_fast_cooling] / Dyn.B[intermid_ind][where_fast_cooling]  *  Dyn.gammac[intermid_ind][where_fast_cooling]**(-5)
-
-                    alpha0Sforward =  alpha0Sfactor * rhoPrimForward[where_slow_cooling]  * Dyn.gamma_min[intermid_ind+1][where_slow_cooling]**(-5) /  Dyn.B[intermid_ind+1][where_slow_cooling]
-                    alpha0Sbehind =  alpha0Sfactor * rhoPrimBehind[where_slow_cooling]  * Dyn.gamma_min[intermid_ind][where_slow_cooling]**(-5) /  Dyn.B[intermid_ind][where_slow_cooling]
-
-                    nuPrimCentral = (nuPrimBehind * weight1 + nuPrimForward * weight2) / weight
-                    alpha0Fcentral = (alpha0Fbehind * weight1[where_fast_cooling] + alpha0Fforward * weight2[where_fast_cooling]) / weight[where_fast_cooling]
-                    alpha0Scentral = (alpha0Sbehind * weight1[where_slow_cooling] + alpha0Sforward * weight2[where_slow_cooling]) / weight[where_slow_cooling]
-                    
-
-                    alphanu = np.zeros(len(numCentral))
-                    ### Fast cooling
-                    alphanu[where_fast_cooling] = alpha0Fcentral * alphanu_func(nuPrimCentral[where_fast_cooling] , numCentral[where_fast_cooling] , nucCentral[where_fast_cooling], True , p)
-                    #alphanu[where_fast_cooling] = alpha0Fcentral * ( (nuPrimCentral[where_fast_cooling]<=nucCentral[where_fast_cooling]) * (nuPrimCentral[where_fast_cooling]/nucCentral[where_fast_cooling])**(-5/3.) + ((nucCentral[where_fast_cooling]<nuPrimCentral[where_fast_cooling])&(nuPrimCentral[where_fast_cooling]<numCentral[where_fast_cooling])) * (nuPrimCentral[where_fast_cooling]/nucCentral[where_fast_cooling])**(-3) + (numCentral[where_fast_cooling]<=nuPrimCentral[where_fast_cooling]) * (numCentral[where_fast_cooling]/nucCentral[where_fast_cooling])**-3*(nuPrimCentral[where_fast_cooling]/numCentral[where_fast_cooling])**(-(p+5)/2.) )
-                    ### Slow cooling
-
-                    alphanu[where_slow_cooling] = alpha0Sforward * alphanu_func(nuPrimCentral[where_slow_cooling] , numCentral[where_slow_cooling] , nucCentral[where_slow_cooling] , False , p)
-                    #alphanu[where_slow_cooling] = alpha0Sforward * ( (nuPrimCentral[where_slow_cooling]<=numCentral[where_slow_cooling])*(nuPrimCentral[where_slow_cooling]/numCentral[where_slow_cooling])**(-5/3.) + ((numCentral[where_slow_cooling]<nuPrimCentral[where_slow_cooling])&(nuPrimCentral[where_slow_cooling]<nucCentral[where_slow_cooling])) * (nuPrimCentral[where_slow_cooling]/numCentral[where_slow_cooling])**(-(p+4)/2.) + (nucCentral[where_slow_cooling]<=nuPrimCentral[where_slow_cooling]) * (nucCentral[where_slow_cooling]/numCentral[where_slow_cooling])**(-(p+4)/2.) * (nuPrimCentral[where_slow_cooling]/nucCentral[where_slow_cooling])**(-(p+5)/2.) )
-                    tau = alphanu * (thickBehind * weight1 + thickForward * weight2) / 2 / weight     #tau is always negative
-
-                    tau[np.where(tau<0)] = 0.
-
-                        
-                    where_low_tau = np.where((tau > 1e-10) & (tau<1e-2))
-                    where_high_tau = np.where(tau > 1e-2)
-                    where_no_tau = np.where(tau < 1e-10)
-
-                    tau_factor = np.zeros(len(tau))
-                    tau_factor[where_low_tau] = (tau[where_low_tau] - tau[where_low_tau]**2/2 + tau[where_low_tau]**3/6) / tau[where_low_tau]
-                    tau_factor[where_high_tau] = (1-np.exp(-tau[where_high_tau]))/tau[where_high_tau]
-                    tau_factor[where_no_tau] = 1.
-
-                    PprimTemp *= tau_factor
-
-                    
-                    if UseOp.reverseShock:
-
-                        
-
-                        numRSCentral = (numRS[intermid_ind_RS] * weight1[where_intermid_ind_RS] + numRS[intermid_ind_RS] * weight2[where_intermid_ind_RS]) / weight[where_intermid_ind_RS]
-                        nucRSCentral = (nucRS[intermid_ind_RS] * weight1[where_intermid_ind_RS] + nucRS[intermid_ind_RS] * weight2[where_intermid_ind_RS]) / weight[where_intermid_ind_RS]
-
-                        alphanuRS = np.zeros(len(intermid_ind_RS))
-
-                        ### Fast cooling
-                        where_fast_cooling_RS = np.where(numRSCentral>nucRSCentral)
-                        alpha0FRSforward = alpha0FRSfactor * rho3primForward[where_fast_cooling_RS] / BRS[intermid_ind_RS+1][where_fast_cooling_RS]  *  gammacRS[intermid_ind_RS+1][where_fast_cooling_RS]**(-5)
-                        alpha0FRSbehind = alpha0FRSfactor * rho3primBehind[where_fast_cooling_RS] / BRS[intermid_ind_RS][where_fast_cooling_RS]  *  gammacRS[intermid_ind_RS][where_fast_cooling_RS]**(-5)
-
-                        alpha0FRScentral = (alpha0FRSbehind * weight1[where_intermid_ind_RS][where_fast_cooling_RS] + alpha0FRSforward * weight2[where_intermid_ind_RS][where_fast_cooling_RS]) / weight[where_intermid_ind_RS][where_fast_cooling_RS]
-
-                        alphanuRS[where_fast_cooling_RS] = alpha0FRScentral * ( (nuPrimCentral[where_intermid_ind_RS][where_fast_cooling_RS]<=nucRSCentral[where_fast_cooling_RS]) * (nuPrimCentral[where_intermid_ind_RS][where_fast_cooling_RS]/nucRSCentral[where_fast_cooling_RS])**(-5/3.) + ((nucRSCentral[where_fast_cooling_RS]<nuPrimCentral[where_intermid_ind_RS][where_fast_cooling_RS])&(nuPrimCentral[where_intermid_ind_RS][where_fast_cooling_RS]<numRSCentral[where_fast_cooling_RS])) * (nuPrimCentral[where_intermid_ind_RS][where_fast_cooling_RS]/nucRSCentral[where_fast_cooling_RS])**(-3) + (numRSCentral[where_fast_cooling_RS]<=nuPrimCentral[where_intermid_ind_RS][where_fast_cooling_RS]) * (numRSCentral[where_fast_cooling_RS]/nucRSCentral[where_fast_cooling_RS])**-3*(nuPrimCentral[where_intermid_ind_RS][where_fast_cooling_RS]/numRSCentral[where_fast_cooling_RS])**(-(ModVar.pRS+5)/2.) )
-
-                        ### Slow cooling
-                        where_slow_cooling_RS = np.where(numRSCentral>=nucRSCentral)
-                        
-                        alpha0SRSforward =  alpha0SRSfactor * rho3primForward[where_slow_cooling_RS]  * gamma_min_RS[intermid_ind_RS+1][where_slow_cooling_RS]**(-5) /  BRS[intermid_ind_RS+1][where_slow_cooling_RS]
-                        alpha0SRSbehind =  alpha0SRSfactor * rho3primBehind[where_slow_cooling_RS]  * gamma_min_RS[intermid_ind_RS][where_slow_cooling_RS]**(-5) /  BRS[intermid_ind_RS][where_slow_cooling_RS]
-                        alpha0SRScentral = (alpha0SRSbehind * weight1[where_intermid_ind_RS][where_slow_cooling_RS] + alpha0SRSforward * weight2[where_intermid_ind_RS][where_slow_cooling_RS]) / weight[where_intermid_ind_RS][where_slow_cooling_RS]
-
-                        alphanuRS[where_slow_cooling_RS] = alpha0SRScentral * ( (nuPrimCentral[where_intermid_ind_RS][where_slow_cooling_RS]<=numRSCentral[where_slow_cooling_RS])*(nuPrimCentral[where_intermid_ind_RS][where_slow_cooling_RS]/numRSCentral[where_slow_cooling_RS])**(-5/3.) + ((numRSCentral[where_slow_cooling_RS]<nuPrimCentral[where_intermid_ind_RS][where_slow_cooling_RS])&(nuPrimCentral[where_intermid_ind_RS][where_slow_cooling_RS]<nucRSCentral[where_slow_cooling_RS])) * (nuPrimCentral[where_intermid_ind_RS][where_slow_cooling_RS]/numRSCentral[where_slow_cooling_RS])**(-(ModVar.pRS+4)/2.) + (nucRSCentral[where_slow_cooling_RS]<=nuPrimCentral[where_intermid_ind_RS][where_slow_cooling_RS]) * (nucRSCentral[where_slow_cooling_RS]/numRSCentral[where_slow_cooling_RS])**(-(ModVar.pRS+4)/2.) * (nuPrimCentral[where_intermid_ind_RS][where_slow_cooling_RS]/nucRSCentral[where_slow_cooling_RS])**(-(ModVar.pRS+5)/2.) )
-
-                        
-
-                        #alphanuRS = alpha0FRScentral * (numRSCentral>nucRSCentral) * ( (nuPrimCentral[where_intermid_ind_RS]<=nucRSCentral) * (nuPrimCentral[where_intermid_ind_RS]/nucRSCentral)**(-5/3.) + ((nucRSCentral<nuPrimCentral[where_intermid_ind_RS])&(nuPrimCentral[where_intermid_ind_RS]<numRSCentral)) * (nuPrimCentral[where_intermid_ind_RS]/nucRSCentral)**(-3) + (numRSCentral<=nuPrimCentral[where_intermid_ind_RS]) * (numRSCentral/nucRSCentral)**-3*(nuPrimCentral[where_intermid_ind_RS]/numRSCentral)**(-(ModVar.pRS+5)/2.) )    +    alpha0SRSforward * (numRSCentral<=nucRSCentral) * ( (nuPrimCentral[where_intermid_ind_RS]<=numRSCentral)*(nuPrimCentral[where_intermid_ind_RS]/numRSCentral)**(-5/3.) + ((numRSCentral<nuPrimCentral[where_intermid_ind_RS])&(nuPrimCentral[where_intermid_ind_RS]<nucRSCentral)) * (nuPrimCentral[where_intermid_ind_RS]/numRSCentral)**(-(ModVar.pRS+4)/2.) + (nucRSCentral<=nuPrimCentral[where_intermid_ind_RS]) * (nucRSCentral/numRSCentral)**(-(ModVar.pRS+4)/2.) * (nuPrimCentral[where_intermid_ind_RS]/nucRSCentral)**(-(ModVar.pRS+5)/2.) )
-
-                        tauRS = alphanuRS * (thicknessRS_behind * weight1[where_intermid_ind_RS] + thicknessRS_forward * weight2[where_intermid_ind_RS]) / 2 / weight[where_intermid_ind_RS]     +    2*tau[where_intermid_ind_RS]#tau is always negative
-
-                        tauRS[np.where(tauRS<0)] = 0.
-
-                        where_low_tau_RS = np.where((tauRS > 1e-10) & (tauRS<1e-2))
-                        where_high_tau_RS = np.where(tauRS>1e-2)
-
-                        PRSprimTemp[where_intermid_ind_RS][where_low_tau_RS] *= (tauRS[where_low_tau_RS]**2/2 + tauRS[where_low_tau_RS]**3/6) / tauRS[where_low_tau_RS]
-                        PRSprimTemp[where_intermid_ind_RS][where_high_tau_RS] *= (1-np.exp(-tauRS[where_high_tau_RS])) / tauRS[where_high_tau_RS]
-                        
-                        where_low_tau = np.where((tau > 1e-10) & (tau<1e-2))
-                        where_high_tau = np.where(tau > 1e-2)
-
-                        PprimTemp[where_low_tau] *= (tau[where_low_tau] - tau[where_low_tau]**2/2 + tau[where_low_tau]**3/6) / tau[where_low_tau]
-                        PprimTemp[where_high_tau] *= (1-np.exp(-tau[where_high_tau]))/tau[where_high_tau]
-                """
                 
                 #angle_integ = (np.cos(xAngInt[:-1]) - np.cos(xAngInt[1:])) * phiInter   #Angular integration segments
                 if not Plot_Exceptions.RS_only and not Plot_Exceptions.FS_only:
@@ -636,31 +509,31 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     PprimTot = PprimTemp
                 elif Plot_Exceptions.RS_only:
                     PprimTot = PRSprimTemp
- 
-                F[rimI] = np.trapz(PprimTot * phiInter  ,  np.cos(Phi)) * distance_factor
+                """
+                if (tobsRed[rimI] > 84*86400 ) and (freqArr < 1e10):
+                    print tobsRed[rimI] / 86400
+                    print freqArr
+                    print phiInter[0]
+                    plt.plot(Phi,phiInter)
+                    plt.show()
+                """
+                F[rimI] = np.trapz(PprimTot * phiInter ,  np.cos(Phi)) * distance_factor
                 ### Negative sign is because integration is reversed on the x-axis (angle axis)
 
 
                 if UseOp.runOption == 'LC' and not UseOp.createMock:
-                    if not Plot_Exceptions.FS_only and not Plot_Exceptions.RS_only: ### Plot as usual
-                        exec('Flux.FFS_%d[rimI] = np.trapz(PprimTemp * phiInter , Phi) * distance_factor'%nuIte)
-                        if UseOp.reverseShock:
-                            exec('Flux.FRS_%d[rimI] = np.trapz(PRSprimTemp * phiInter , Phi) * distance_factor'%nuIte)
-                    elif Plot_Exceptions.FS_only:
-                        exec('Flux.FFS_%d[rimI] = np.trapz(PprimTemp * phiInter , Phi) * distance_factor'%nuIte)
-                    elif Plot_Exceptions.RS_only:
-                        exec('Flux.FRS_%d[rimI] = np.trapz(PRSprimTemp * phiInter , Phi) * distance_factor'%nuIte)
-                    else:
-                        raise NameError('This exception should not be entered')
-
-    
+                    if not Plot_Exceptions.RS_only:
+                        Flux.FFS[nuIte,rimI] = np.trapz(PprimTemp * phiInter , Phi) * distance_factor
+                    if UseOp.reverseShock and not Plot_Exceptions.FS_only:
+                        Flux.FRS[nuIte,rimI] = np.trapz(PRSprimTemp * phiInter , Phi) * distance_factor
+                    Flux.Ftotal[nuIte,rimI] = np.copy(F[rimI])
 
         if UseOp.plotComponents and UseOp.runOption == 'LC':
             if not Plot_Exceptions.RS_only:
-                exec('plt.plot(tobsRed/PlotDetails.scalePlotTime[UseOp.daysOrSec] , Flux.FFS_%d * PlotDetails.scaleFluxAxis[UseOp.fluxAxis] , \'%%s--\'%%PlotDetails.colourCycle[nuIte])'%nuIte)
+                plt.plot(tobsRed/PlotDetails.scalePlotTime[UseOp.daysOrSec] , Flux.FFS[nuIte] * PlotDetails.scaleFluxAxis[UseOp.fluxAxis] , '%s--'%PlotDetails.colourCycle[nuIte])
             if UseOp.reverseShock:
                 if not Plot_Exceptions.FS_only:
-                    exec('plt.plot(tobsRed/PlotDetails.scalePlotTime[UseOp.daysOrSec] , Flux.FRS_%d * PlotDetails.scaleFluxAxis[UseOp.fluxAxis] , \'%s:\'%PlotDetails.colourCycle[nuIte])'%nuIte)
+                    plt.plot(tobsRed/PlotDetails.scalePlotTime[UseOp.daysOrSec] , Flux.FRS[nuIte] * PlotDetails.scaleFluxAxis[UseOp.fluxAxis] , '%s:'%PlotDetails.colourCycle[nuIte])
 
 
         if UseOp.thermalComp:
@@ -722,6 +595,22 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
     if (UseOp.runOption == 'LC') or (UseOp.runOption == 'one-sigma'): 
 
         print "Synchrotron time use: %f s"%(time.time() - dynTimeStart)
+
+        ### Saving flux
+        if not os.path.isdir('Flux'):
+            os.mkdir('Flux/')
+            print 'Created directory Flux'
+        if not Plot_Exceptions.RS_only:
+            if os.path.isfile('Flux/FFS.txt'):
+                os.system('rm Flux/FFS.txt')
+            np.savetxt('Flux/FFS.txt' , Flux.FFS)
+        if UseOp.reverseShock and not Plot_Exceptions.FS_only:
+            if os.path.isfile('Flux/FRS.txt'):
+                os.system('rm Flux/FRS.txt')
+            np.savetxt('Flux/FRS.txt' , Flux.FRS)
+        if os.path.isfile('Flux/Ftotal.txt'):
+            os.system('rm Flux/Ftotal.txt')
+        np.savetxt('Flux/Ftotal.txt' , Flux.Ftotal)
 
         if UseOp.allowPrint & (noChi2 == False): print "chi2 = %s\nReduced chi2 = %s"%(chi2,chi2 / (numberOfPoints-ndims) )
         #print lightcurve
