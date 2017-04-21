@@ -308,6 +308,10 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     intermid_ind_RS = intermid_ind[where_RS] ### Finds what indeces has an RS counter part.
                     EATSrings_RS = len(intermid_ind_RS) + 2
 
+                    ### innermost and edge elements of RS
+                    first_index_RS = intermid_ind_RS[-1]
+                    last_index_RS = intermid_ind_RS[0] - 1
+
                 ### Setting array containing angle from LoS to EATS rings
                 Phi = np.zeros(EATSrings)
                 #if len(Phi) == 2: ### If there are no Dyn points inside the EATS, we have to interpolate the edges
@@ -418,11 +422,11 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     PprimTemp *= tau_factor
                 if UseOp.reverseShock:
 
-                    where_angleInd_RS = np.where((intermid_ind >= RS_elements_lower) & ( intermid_ind < (RS_elements_upper-1)))
-                    angleInd_RS = np.copy(intermid_ind[where_angleInd_RS])   ### These elements should be used when calculating radiation from RS
 
-                    PRSprimTemp = np.zeros(EATSrings)
-                    PRSprimTemp[where_RS] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True)
+                    PRSprimTemp = np.zeros(EATSrings_RS)
+                    PRSprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , False )
+                    PRSprimTemp[0] , PRSprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , False , True , InterWeights , last_index , first_index)
+                    PprimTemp[0] , PprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi , intermid_ind , Kappas, False , False , InterWeights , last_index , first_index)
 
                     if opticalDepth:
                         tauRS = tauFS + self_absorption(Dyn , ModVar , selfAbsRS , Rad , NatCon , InterWeights , nuPrim[where_RS] , intermid_ind_RS , True)
@@ -490,13 +494,13 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     raise SystemExit(0)
 
                 intermid_ind = angleInd[where_angleInd]
-                """
+                
                 ### Finds what elements on the EATsurface has a counterpart in the RS
                 if UseOp.reverseShock:
                     where_angleInd_RS = np.where((intermid_ind >= RS_elements_lower) & ( intermid_ind < (RS_elements_upper-1)))
                     angleInd_RS = np.copy(intermid_ind[where_angleInd_RS])   ### These elements should be used when calculating radiation from RS
 
-                
+                """
                 
                 
                 #angle_integ = (np.cos(xAngInt[:-1]) - np.cos(xAngInt[1:])) * phiInter   #Angular integration segments

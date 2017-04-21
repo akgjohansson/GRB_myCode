@@ -10,7 +10,7 @@ class Dynamics:
         if UseOp.reverseShock:
             self.rho3prim = 4 * self.Gamma[:self.RS_elements_upper] * self.rho4
             self.nprim3 = self.rho3prim / NatCon.mp
-            self.thickness_RS = self.M3/ (8*np.pi*(1.-np.cos(self.theta)) * self.Gamma**2*self.rho4*self.R**2)
+            self.thickness_RS = self.M3[:self.RS_elements_upper]/ (8*np.pi*(1.-np.cos(self.theta[:self.RS_elements_upper])) * self.Gamma[:self.RS_elements_upper]**2*self.rho4[:self.RS_elements_upper]*self.R[:self.RS_elements_upper]**2)
 
 #This module considers the Nava et al. (2013) paper. 
 def dyn(R0,ModVar,UseOp,tobsEnd,tol):

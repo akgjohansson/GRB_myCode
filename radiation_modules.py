@@ -238,7 +238,7 @@ class weights:
             self.numRS_edge = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'edge','log')
             self.nucRS_edge = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'edge','log')
             self.rho4_edge = self.interpolator(Dyn.rho4[last_index] , Dyn.rho4[last_index+1] , 'edge','log')            
-            self.gammac_RS_edge = self.interpolator(Dyn.gammac_RS[last_index] , Dyn.gammac_RS[last_index+1] , 'edge','log')
+            self.gammac_RS_edge = self.interpolator(Dyn.gammacRS[last_index] , Dyn.gammacRS[last_index+1] , 'edge','log')
             self.gamma_min_RS_edge = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'edge','log')
             self.thickness_RS_edge = self.interpolator(Dyn.thickness_RS[last_index] , Dyn.thickness_RS[last_index+1] , 'edge','log')
         ### Interpolating dynamics values of the LoS part of the EATS
@@ -262,7 +262,7 @@ class weights:
             self.BRS_front = self.interpolator(Dyn.BRS[first_index] , Dyn.BRS[first_index+1] , 'front','log')
             self.numRS_front = self.interpolator(Rad.numRS[first_index] , Rad.numRS[first_index+1] , 'front','log')
             self.nucRS_front = self.interpolator(Rad.nucRS[first_index] , Rad.nucRS[first_index+1] , 'front','log')
-            self.gammac_RS_front = self.interpolator(Dyn.gammac_RS[first_index] , Dyn.gammac_RS[first_index+1] , 'front','log')
+            self.gammac_RS_front = self.interpolator(Dyn.gammacRS[first_index] , Dyn.gammacRS[first_index+1] , 'front','log')
             self.gamma_min_RS_front = self.interpolator(Dyn.gamma_min_RS[first_index] , Dyn.gamma_min_RS[first_index+1] , 'front','log')
             self.thickness_RS_front = self.interpolator(Dyn.thickness_RS[first_index] , Dyn.thickness_RS[first_index+1] , 'front','log')
     def interpolator(self,lower,upper,region,scale='log'):
