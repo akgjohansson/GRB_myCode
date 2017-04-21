@@ -25,12 +25,7 @@ class model_variables:
         self.z = 1.62         #Redshift
         self.tprompt_log = 3.         #Duration time of prompt phase. Needed for the reverse shock. Input time is observer frame, the module returns the progenitor frame time. Note from 29/1 -14
         self.pRS = 2.05          #Ratio between fixed reverse shock and forward shock microphysical ceofficients. Assumes coeffs of forward shock to set coeffs of reverse shock. If you want to use this, set fixedRSFSratio = TRUE in beginning of mainFit.py.
-        self.const_names = []  ### Empty array. Will be filled by calling constant_names() method
-
-        ### Saving attribute names of self class
-        for attr , value in self.__dict__.items():
-            if not attr == 'const_names':
-                self.const_names.append(attr)
+        self.const_names = np.array(['epsilonLog','epsiloneLog','epsilonpLog','epsilone3Log','epsilonp3Log','E0log','nCMLog','A0Log','s','R_ISM_log','Gamma0log','eBlog','eB3log','p','logt0','theta0','alpha','z','tprompt_log'])
 
 
         #return epsilonLog,epsiloneLog,epsilonpLog,epsilone3Log,epsilonp3Log,E0,nCMLog,A0Log,s,R_ISM,Gamma0log,eB,eB3,p,logt0,theta0,alpha,tN,logrphoto,Tprim0,N0,tprompt_log,pRS,R0_Clog,N_Clog,t_outflow_log,Ctheta,GammaClog,z,WV
@@ -89,7 +84,7 @@ class userOptions:
         self.preferredPlotScale = ['lin','log','lin','log','lin','log','log','lin','lin','log','log','log','log','lin','None','deg','deg','None','None','None','None','lin','lin','log','log','log','deg','log','lin','lin'] #Determines what x-scale the probability plots should have. Parameter preferredScale in mainFit.py determines scale used in fitter
 
         #Dynamics options
-        self.reverseShock = True            #Include a reverse shock component?
+        self.reverseShock = False            #Include a reverse shock component?
         self.exponential_outflow = True        #Ejecta density distribution exponentially (True) or constant (False)?
         self.opticalDepth = True           #Take synchrotron self-absorption optical depth into account? True: yes
         self.fixedRSFSratio = False          #Fixed ratio between the microphysical coefficients esilone,epsilonp,epsilonB and p of the reverse shock and the forward shock?
