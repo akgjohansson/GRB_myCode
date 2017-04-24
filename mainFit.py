@@ -87,6 +87,7 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
                         print paramNames[j]
                         print ModVar.echo_value(j)
                         print '-'*20
+                        print ModVar.const_names[j]
                         
                     paramOut = "%s\nsurfaceRings = %d"%(paramOut,surfRingsOut)
                     utParams = open('parameters.txt','w')
