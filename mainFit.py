@@ -80,7 +80,7 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
 
                     utText =  "New lowest chi2:\n"
                     paramOut = "%s=%s"%(paramNames[0],ModVar.echo_value(0))
-                    for j in range(len(ModVar.const_names)):
+                    for j in range(1,len(ModVar.const_names)):
                         paramOut = "%s\n%s=%s"%(paramOut,paramNames[j],ModVar.echo_value(j))
                         ### why are the parameters printed in the wrong order?
                         print j
@@ -1496,7 +1496,7 @@ loadInputConstants = True #When this is true, the options.py file is loaded for 
 printPlot = False
 plot_area = False
 plot_SED = False
-paramNames = np.array(['log10(epsilon_rad)','log10(epsilone_FS)','log10(epsilonp_FS)','log10(epsilone_RS)','log10(epsilonp_RS)','log10(E0)','log10(n_CM)','log10(A0)','s','R_ISM','log10(Gamma0)','log10(epsilonB_FS)','log10(epsilonB_RS)','p_FS','t0','theta0','alpha','t_prompt','p_RS','z'])
+paramNames = np.array(['log10(epsilon_rad)','log10(epsilon_rad_RS)','log10(epsilone_FS)','log10(epsilonp_FS)','log10(epsilone_RS)','log10(epsilonp_RS)','log10(E0)','log10(n_CM)','log10(A0)','s','R_ISM','log10(Gamma0)','log10(epsilonB_FS)','log10(epsilonB_RS)','p_FS','t0','theta0','alpha','t_prompt','p_RS','z'])
 latexParamNames = [r'$\log_{10}(\epsilon_{\rm rad})$',r'$\log_{10}(\epsilon_{\rm e})$',r'$\log_{10}(\epsilon_{\rm p})$',r'$\log_{10}(\epsilon_{\rm e,RS})$',r'$\log_{10}(\epsilon_{\rm p,RS})$',r'$\log_{10}(E_0)$',r'$\log_{10}(n_{\rm CM})$',r'$\log_{10}(A_0) [{\rm cm}^{-3+s}]$',r'$s$',r'$log_{10}(R_{\rm ISM})$',r'$\log_{10}(\Gamma_0)$',r'$\log_{10}(\epsilon_{\rm B})$',r'$\log_{10}(\epsilon_{\rm B,RS})$',r'$p_{\rm FS}$',r'$t_0$',r'$\theta_0$',r'$\alpha$',r'$\Delta t_{\rm of}$',r'$p_{\rm RS}$',r'$z$']
 latexParamNamesLin = [r'$\epsilon_{\rm rad}$',r'$\epsilon_{\rm e}$',r'$\epsilon_{\rm p}$',r'$\epsilon_{\rm e,RS}$',r'$\epsilon_{\rm p,RS}$',r'$E_{\rm 0,iso}$',r'$n_{\rm CM}$',r'$A_0$',r'$s$',r'$R_{\rm ISM}$',r'$\Gamma_0$',r'$\epsilon_{\rm B}$',r'$\epsilon_{\rm B,RS}$',r'$p_{\rm FS}$',r'$t_0$',r'$\theta_0 (^{\circ})$',r'$\alpha (^{\circ})$',r'$\Delta t_{\rm of}$',r'$p_{\rm RS}$',r'$z$']
 paramNamesShort = np.array(['epsilon','epsilon_e','epsilon_p','epsilon_e_RS','epsilon_p_RS','E0','n_CM','A_0','s','R_ISM','Gamma0','epsilon_B','epsilon_B_RS','p','t0','theta0','alpha','t_prompt','p_RS','z'])
