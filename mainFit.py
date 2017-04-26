@@ -1498,10 +1498,10 @@ plot_area = False
 plot_SED = False
 paramNames = np.array(['log10(epsilon_rad)','log10(epsilon_rad_RS)','log10(epsilone_FS)','log10(epsilonp_FS)','log10(epsilone_RS)','log10(epsilonp_RS)','log10(E0)','log10(n_CM)','log10(A0)','s','R_ISM','log10(Gamma0)','log10(epsilonB_FS)','log10(epsilonB_RS)','p_FS','t0','theta0','alpha','t_prompt','p_RS','z'])
 latexParamNames = [r'$\log_{10}(\epsilon_{\rm rad})$',r'$\log_{10}(\epsilon_{\rm e})$',r'$\log_{10}(\epsilon_{\rm p})$',r'$\log_{10}(\epsilon_{\rm e,RS})$',r'$\log_{10}(\epsilon_{\rm p,RS})$',r'$\log_{10}(E_0)$',r'$\log_{10}(n_{\rm CM})$',r'$\log_{10}(A_0) [{\rm cm}^{-3+s}]$',r'$s$',r'$log_{10}(R_{\rm ISM})$',r'$\log_{10}(\Gamma_0)$',r'$\log_{10}(\epsilon_{\rm B})$',r'$\log_{10}(\epsilon_{\rm B,RS})$',r'$p_{\rm FS}$',r'$t_0$',r'$\theta_0$',r'$\alpha$',r'$\Delta t_{\rm of}$',r'$p_{\rm RS}$',r'$z$']
-latexParamNamesLin = [r'$\epsilon_{\rm rad}$',r'$\epsilon_{\rm e}$',r'$\epsilon_{\rm p}$',r'$\epsilon_{\rm e,RS}$',r'$\epsilon_{\rm p,RS}$',r'$E_{\rm 0,iso}$',r'$n_{\rm CM}$',r'$A_0$',r'$s$',r'$R_{\rm ISM}$',r'$\Gamma_0$',r'$\epsilon_{\rm B}$',r'$\epsilon_{\rm B,RS}$',r'$p_{\rm FS}$',r'$t_0$',r'$\theta_0 (^{\circ})$',r'$\alpha (^{\circ})$',r'$\Delta t_{\rm of}$',r'$p_{\rm RS}$',r'$z$']
-paramNamesShort = np.array(['epsilon','epsilon_e','epsilon_p','epsilon_e_RS','epsilon_p_RS','E0','n_CM','A_0','s','R_ISM','Gamma0','epsilon_B','epsilon_B_RS','p','t0','theta0','alpha','t_prompt','p_RS','z'])
+latexParamNamesLin = [r'$\epsilon_{\rm rad}$',r'$\epsilon_{\rm rad,RS}$',r'$\epsilon_{\rm e}$',r'$\epsilon_{\rm p}$',r'$\epsilon_{\rm e,RS}$',r'$\epsilon_{\rm p,RS}$',r'$E_{\rm 0,iso}$',r'$n_{\rm CM}$',r'$A_0$',r'$s$',r'$R_{\rm ISM}$',r'$\Gamma_0$',r'$\epsilon_{\rm B}$',r'$\epsilon_{\rm B,RS}$',r'$p_{\rm FS}$',r'$t_0$',r'$\theta_0 (^{\circ})$',r'$\alpha (^{\circ})$',r'$\Delta t_{\rm of}$',r'$p_{\rm RS}$',r'$z$']
+paramNamesShort = np.array(['epsilon','epsilon_RS','epsilon_e','epsilon_p','epsilon_e_RS','epsilon_p_RS','E0','n_CM','A_0','s','R_ISM','Gamma0','epsilon_B','epsilon_B_RS','p','t0','theta0','alpha','t_prompt','p_RS','z'])
 #                            e_rad e_e2  e_p2  e_e3  e_p3  E0    n_CM   A0    s    R_ISM Gam0  e_B2  e_B3   p2       theta0 alpha tprompt p3  
-preferredScale = np.array(['log','log','log','log','log','log','log','log','lin','log','log','log','log','lin','None','deg','deg','log','lin','lin'])
+preferredScale = np.array(['log','log','log','log','log','log','log','log','log','lin','log','log','log','log','lin','None','deg','deg','log','lin','lin'])
 constantsLength = len(paramNames) #The number of elements in contants list
 
 
