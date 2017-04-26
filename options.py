@@ -172,11 +172,11 @@ class userOptions:
         #        Variables for fitting           #
         ##########################################
 
-                  #Order:       epsil,eps_E,eps_P, eE_RS,eP_RS, E0  n/A0   s    R_ISM Gamma;epsB; eB_RS   p    t0  theta0 alpha prompt, pRS   z 
+                  #Order:       epsil,epsRS,eps_E,eps_P, eE_RS,eP_RS, E0  n/A0   s    R_ISM Gamma;epsB; eB_RS   p    t0  theta0 alpha prompt, pRS   z 
         if self.reverseShock:
-            self.parametrar = [False,True ,False,True ,False,True ,True ,False,True ,True ,True ,True ,True ,False,True ,True ,True ,True ,False] #False = Constant. 
+            self.parametrar = [False,False,True ,False,True ,False,True ,True ,False,True ,True ,True ,True ,True ,False,True ,True ,True ,True ,False] #False = Constant. 
 
         else:           
-            self.parametrar = [False,True ,False,False,False,True ,True ,False,True ,True ,True ,False,True ,False,True ,True ,False,False,False] #False = Constant. 
+            self.parametrar = [False,False,True ,False,False,False,True ,True ,False,True ,True ,True ,False,True ,False,True ,True ,False,False,False] #False = Constant. 
 
 
