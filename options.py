@@ -36,9 +36,10 @@ class model_variables:
 
         try:
         #if True:
-            for i in index:### If index is not an array, this will fail and go into except
-                exec('self.%s = new_value[i]'%self.const_names[i])
+            for i in range(len(index)):### If index is not an array, this will fail and go into except
+                exec('self.%s = new_value[index[i]]'%self.const_names[i])
         except: ### input index is not an array
+            print 'Bad value!'
             raw_input()
             #exec('self.%s = new_value'%self.const_names[i])
 
