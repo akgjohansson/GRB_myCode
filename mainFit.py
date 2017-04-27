@@ -24,7 +24,8 @@ np.set_printoptions(threshold=np.nan)
 def myPrior(cube,ndims,nparam):
 
     cubeIndex = np.array(np.where(UseOp.parametrar))
-    for i in range(ndims): cube[i] = UseOp.paramLimits[cubeIndex[0,i],0] +  cube[i] * (UseOp.paramLimits[cubeIndex[0,i],1]-UseOp.paramLimits[cubeIndex[0,i],0])
+    #for i in range(ndims): 
+    cube = UseOp.paramLimits[cubeIndex[0],0] +  cube * (UseOp.paramLimits[cubeIndex[0],1]-UseOp.paramLimits[cubeIndex[0],0])
     
 
 def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbarInput=None,cm_numberOfEmpties=None,cm_numberOfPoints=None):
@@ -33,8 +34,8 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
     if (UseOp.runOption=='LC') and UseOp.createMock: FdataInput, tdata, errorbarInput, numberOfEmpties,numberOfEmpties = cm_FdataInput, cm_tdata, cm_errorbarInput, cm_numberOfEmpties, cm_numberOfEmpties
 
     if UseOp.runOption == 'fit': 
-        for i in range(np.sum(UseOp.parametrar)): 
-            ModVar.new_value(np.array(np.where(UseOp.parametrar))[0] , cube) #Assigning input value from prior
+        #for i in range(np.sum(UseOp.parametrar)): 
+        ModVar.new_value(np.array(np.where(UseOp.parametrar))[0] , cube) #Assigning input value from prior
     else:
         startTime = time.time()
         print "Number of parameters: %d"%np.sum(UseOp.parametrar)
