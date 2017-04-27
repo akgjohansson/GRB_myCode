@@ -33,10 +33,10 @@ class model_variables:
 
     ### Method to change values of objects in ModVar class
     def new_value(self, index , new_value):
-        
+
         try:
         #if True:
-            for i in range(len(index)):### If index is not an array, this will fail and go into except
+            for i in index:### If index is not an array, this will fail and go into except
                 exec('self.%s = new_value[i]'%self.const_names[i])
         except: ### input index is not an array
             raw_input()
