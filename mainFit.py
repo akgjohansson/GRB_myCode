@@ -1468,15 +1468,14 @@ if np.sum((UseOp.radiativeLosses==False)  +  UseOp.fixedRSFSratio + UseOp.fixed_
 ModVar = model_variables()
 PlotDetails = plot_details()
 
-if ModVar.s == 0: #Constand CBM. We do not want to include R_ISM in parameterer sampling
-    UseOp.parametrar[9] = False
+
 
 
 #constants = np.array(options.inputConstants()) 
 
 ### Correcting boolean vector parametrar to automatically prior range for the number density n, depending if CM or WM model
    ### Variable s is constants[8], density prior range is parametrar[6]. Now adding another boolean into parametrar[6]
-if UseOp.parametrar[6]:
+if UseOp.parametrar[7]:
     paramet_tail = np.copy(UseOp.parametrar[7:])
     if ModVar.s == 0: ### CM
         UseOp.parametrar = np.concatenate([UseOp.parametrar[:6],[True,False],UseOp.parametrar[7:]])
