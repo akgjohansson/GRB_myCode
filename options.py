@@ -45,7 +45,6 @@ class model_variables:
             #exec('self.%s = new_value'%self.const_names[i])
 
     def echo_value(self, index):
-        print 'out_value = self.%s'%self.const_names[index]
         exec('out_value = self.%s'%self.const_names[index])
         return out_value
 

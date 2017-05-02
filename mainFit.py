@@ -83,14 +83,6 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
                     paramOut = "%s=%s"%(paramNames[0],ModVar.echo_value(0))
                     for j in range(1,len(ModVar.const_names)):
                         paramOut = "%s\n%s=%s"%(paramOut,paramNames[j],ModVar.echo_value(j))
-                        ### why are the parameters printed in the wrong order?
-                        print j
-                        print paramNames[j]
-                        print ModVar.echo_value(j)
-                        print '-'*20
-                        print ModVar.const_names[j]
-                        print paramNames
-                        print ModVar.const_names
                         
                     paramOut = "%s\nsurfaceRings = %d"%(paramOut,surfRingsOut)
                     utParams = open('parameters.txt','w')
