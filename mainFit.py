@@ -35,7 +35,7 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
 
     if UseOp.runOption == 'fit': 
         #for i in range(np.sum(UseOp.parametrar)): 
-        ModVar.new_value(np.array(UseOp.parametrar) , cube) #Assigning input value from prior
+        ModVar.new_value(np.where(UseOp.parametrar)[0] , cube) #Assigning input value from prior
     else:
         startTime = time.time()
         print "Number of parameters: %d"%np.sum(UseOp.parametrar)

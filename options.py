@@ -40,6 +40,7 @@ class model_variables:
                 exec('self.%s = new_value[i]'%self.const_names[index[i]])
         except: ### input index is not an array
             print 'Bad value!'
+            print 'self.%s = new_value[i]'%self.const_names[index[i]]
             raw_input()
             #exec('self.%s = new_value'%self.const_names[i])
 
