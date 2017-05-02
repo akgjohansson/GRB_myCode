@@ -23,9 +23,9 @@ np.set_printoptions(threshold=np.nan)
 
 def myPrior(cube,ndims,nparam):
 
-    cubeIndex = np.where(UseOp.parametrar)
+    cubeIndex = np.where(UseOp.parametrar)[0]
     for i in range(ndims):
-        cube[i] = UseOp.paramLimits[cubeIndex[0,i],0] +  cube[i] * (UseOp.paramLimits[cubeIndex[0,i],1]-UseOp.paramLimits[cubeIndex[0,i],0])
+        cube[i] = UseOp.paramLimits[cubeIndex[i],0] +  cube[i] * (UseOp.paramLimits[cubeIndex[i],1]-UseOp.paramLimits[cubeIndex[i],0])
     
 
 def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbarInput=None,cm_numberOfEmpties=None,cm_numberOfPoints=None):
