@@ -37,7 +37,7 @@ class model_variables:
         try:
         #if True:
             for i in range(len(index)):### If index is not an array, this will fail and go into except
-                exec('self.%s = new_value[index[i]]'%self.const_names[i])
+                exec('self.%s = new_value[i]'%self.const_names[index[i]])
         except: ### input index is not an array
             print 'Bad value!'
             raw_input()
@@ -181,4 +181,6 @@ class userOptions:
         else:           
             self.parametrar = [False,False,True ,False,False,False,True ,True ,False,True ,True ,True ,False,True ,False,True ,True ,False,False,False] #False = Constant. 
 
+
+        self.parametrar = np.array(self.parametrar)
 

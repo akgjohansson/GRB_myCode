@@ -35,7 +35,7 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
 
     if UseOp.runOption == 'fit': 
         #for i in range(np.sum(UseOp.parametrar)): 
-        ModVar.new_value(np.array(np.where(UseOp.parametrar))[0] , cube) #Assigning input value from prior
+        ModVar.new_value(np.array(UseOp.parametrar) , cube) #Assigning input value from prior
     else:
         startTime = time.time()
         print "Number of parameters: %d"%np.sum(UseOp.parametrar)
@@ -1468,6 +1468,8 @@ if np.sum((UseOp.radiativeLosses==False)  +  UseOp.fixedRSFSratio + UseOp.fixed_
 ModVar = model_variables()
 PlotDetails = plot_details()
 
+if ModVar.s == 0: #Constand CBM. We do not want to include R_ISM in parameterer sampling
+    UseOp.parametrar[9] = False
 
 
 #constants = np.array(options.inputConstants()) 
