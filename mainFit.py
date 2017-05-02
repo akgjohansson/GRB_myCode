@@ -23,7 +23,7 @@ np.set_printoptions(threshold=np.nan)
 
 def myPrior(cube,ndims,nparam):
 
-    cubeIndex = np.array(np.where(UseOp.parametrar))
+    cubeIndex = np.where(UseOp.parametrar)
     for i in range(ndims):
         cube[i] = UseOp.paramLimits[cubeIndex[0,i],0] +  cube[i] * (UseOp.paramLimits[cubeIndex[0,i],1]-UseOp.paramLimits[cubeIndex[0,i],0])
     

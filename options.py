@@ -153,6 +153,7 @@ class userOptions:
 
         self.paramLimits = np.array([
             [-.8,0.]              #epsilon
+            ,[-8,0.]               #epsilon_RS
             ,[-6.,-.1]              #epsilon e (logarithmic)
             ,[-8.,0.]              #epsilon p (logarithmic)
             ,[-6.,-.1]              #epsilon e RS (logarithmic)
