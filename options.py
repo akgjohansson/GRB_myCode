@@ -37,14 +37,14 @@ class model_variables:
         try:
         #if True:
             for i in range(len(index)):### If index is not an array, this will fail and go into except
-                exec('self.%s = new_value[index[i]]'%self.const_names[i])
+                exec('self.%s = new_value[i]'%self.const_names[index[i]])
         except: ### input index is not an array
             print 'Bad value!'
+            print 'self.%s = new_value[i]'%self.const_names[index[i]]
             raw_input()
             #exec('self.%s = new_value'%self.const_names[i])
 
     def echo_value(self, index):
-        print 'out_value = self.%s'%self.const_names[index]
         exec('out_value = self.%s'%self.const_names[index])
         return out_value
 
@@ -150,6 +150,7 @@ class userOptions:
 
         self.paramLimits = np.array([
             [-.8,0.]              #epsilon
+            ,[-8,0.]               #epsilon_RS
             ,[-6.,-.1]              #epsilon e (logarithmic)
             ,[-8.,0.]              #epsilon p (logarithmic)
             ,[-6.,-.1]              #epsilon e RS (logarithmic)
@@ -181,4 +182,6 @@ class userOptions:
         else:           
             self.parametrar = [False,False,True ,False,False,False,True ,True ,False,True ,True ,True ,False,True ,False,True ,True ,False,False,False] #False = Constant. 
 
+
+        self.parametrar = np.array(self.parametrar)
 

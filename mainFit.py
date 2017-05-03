@@ -23,9 +23,9 @@ np.set_printoptions(threshold=np.nan)
 
 def myPrior(cube,ndims,nparam):
 
-    cubeIndex = np.array(np.where(UseOp.parametrar))
+    cubeIndex = np.where(UseOp.parametrar)[0]
     for i in range(ndims):
-        cube[i] = UseOp.paramLimits[cubeIndex[0,i],0] +  cube[i] * (UseOp.paramLimits[cubeIndex[0,i],1]-UseOp.paramLimits[cubeIndex[0,i],0])
+        cube[i] = UseOp.paramLimits[cubeIndex[i],0] +  cube[i] * (UseOp.paramLimits[cubeIndex[i],1]-UseOp.paramLimits[cubeIndex[i],0])
     
 
 def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbarInput=None,cm_numberOfEmpties=None,cm_numberOfPoints=None):
@@ -35,7 +35,7 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
 
     if UseOp.runOption == 'fit': 
         #for i in range(np.sum(UseOp.parametrar)): 
-        ModVar.new_value(np.array(np.where(UseOp.parametrar))[0] , cube) #Assigning input value from prior
+        ModVar.new_value(np.where(UseOp.parametrar)[0] , cube) #Assigning input value from prior
     else:
         startTime = time.time()
         print "Number of parameters: %d"%np.sum(UseOp.parametrar)
@@ -83,14 +83,6 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
                     paramOut = "%s=%s"%(paramNames[0],ModVar.echo_value(0))
                     for j in range(1,len(ModVar.const_names)):
                         paramOut = "%s\n%s=%s"%(paramOut,paramNames[j],ModVar.echo_value(j))
-                        ### why are the parameters printed in the wrong order?
-                        print j
-                        print paramNames[j]
-                        print ModVar.echo_value(j)
-                        print '-'*20
-                        print ModVar.const_names[j]
-                        print paramNames
-                        print ModVar.const_names
                         
                     paramOut = "%s\nsurfaceRings = %d"%(paramOut,surfRingsOut)
                     utParams = open('parameters.txt','w')
@@ -1470,11 +1462,12 @@ PlotDetails = plot_details()
 
 
 
+
 #constants = np.array(options.inputConstants()) 
 
 ### Correcting boolean vector parametrar to automatically prior range for the number density n, depending if CM or WM model
    ### Variable s is constants[8], density prior range is parametrar[6]. Now adding another boolean into parametrar[6]
-if UseOp.parametrar[6]:
+if UseOp.parametrar[7]:
     paramet_tail = np.copy(UseOp.parametrar[7:])
     if ModVar.s == 0: ### CM
         UseOp.parametrar = np.concatenate([UseOp.parametrar[:6],[True,False],UseOp.parametrar[7:]])
