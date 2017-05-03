@@ -1,7 +1,7 @@
 def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,iterationLength,numberOfEmpties,numberOfPoints,ndims,Plot_Exceptions,plot_SED=False):
     import numpy as np
     from dynamics import Dynamics
-    from matplotlib import pyplot as plt
+
     from cosmocalc import cosmocalc
     if UseOp.runOption=='LC': import time
     from EATS_func import eats_function
@@ -16,6 +16,9 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
     from radiation_modules import weights
     from radiation_modules import flux_allocation
     from radiation_modules import self_absorption
+    if UseOp.runOption != 'fit':
+        from matplotlib import pyplot as plt
+
     #Natural constants
 
     NatCon = cgs_constants()
@@ -125,7 +128,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
 
     chi2 = 0.
-    timeGrid = 1000   #How tight the lightcurve grid should be when runOption=='LC'
+    timeGrid = 100   #How tight the lightcurve grid should be when runOption=='LC'
     timeGridSigma = 400
 
 
@@ -615,7 +618,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
         if os.path.isfile('Flux/Ftotal.txt'):
             os.system('rm Flux/Ftotal.txt')
         np.savetxt('Flux/Ftotal.txt' , Flux.Ftotal)
-
+        np.savetxt('Flux/tobs.txt' , tobsRed)
         if UseOp.allowPrint & (noChi2 == False): print "chi2 = %s\nReduced chi2 = %s"%(chi2,chi2 / (numberOfPoints-ndims) )
         #print lightcurve
 

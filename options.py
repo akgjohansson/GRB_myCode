@@ -16,7 +16,7 @@ class model_variables:
         self.A0Log = 33 # Circumstellar density, windlike medium
         self.s = 0.0 #CBM power law slope
         self.R_ISM_log = 18.  # Radius of transition to interstellar matter. Logarithmic
-        self.Gamma0log = np.log10(10.) #Initial gamma
+        self.Gamma0log = np.log10(100.) #Initial gamma
         self.eBlog = -3#np.log10(3.5e-4) #Magnetic microphysical constant in Forward Shock (region 2)
         self.eB3log = -4   #Magnetic microphysical constant in Reverse Shock (region 3)
         self.p = 2.1  #Synchrotron emission power law
