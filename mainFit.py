@@ -1467,13 +1467,15 @@ PlotDetails = plot_details()
 
 ### Correcting boolean vector parametrar to automatically prior range for the number density n, depending if CM or WM model
    ### Variable s is constants[8], density prior range is parametrar[6]. Now adding another boolean into parametrar[6]
+   
 if UseOp.parametrar[7]:
     paramet_tail = np.copy(UseOp.parametrar[7:])
     if ModVar.s == 0: ### CM
-        UseOp.parametrar = np.concatenate([UseOp.parametrar[:6],[True,False],UseOp.parametrar[7:]])
-        UseOp.parametrar[9] = False
+        UseOp.parametrar = np.concatenate([UseOp.parametrar[:7],[True,False],UseOp.parametrar[8:]])
+        UseOp.parametrar[10] = False ### Do not fit R_ISM
     else:
-        UseOp.parametrar = np.concatenate([UseOp.parametrar[:6],[False,True],UseOp.parametrar[7:]])
+        UseOp.parametrar = np.concatenate([UseOp.parametrar[:7],[False,True],UseOp.parametrar[8:]])
+        
         
 
 

@@ -26,7 +26,9 @@ class model_variables:
         self.z = 1.62         #Redshift
         self.tprompt_log = 3.         #Duration time of prompt phase. Needed for the reverse shock. Input time is observer frame, the module returns the progenitor frame time. Note from 29/1 -14
         self.pRS = 2.05          #Ratio between fixed reverse shock and forward shock microphysical ceofficients. Assumes coeffs of forward shock to set coeffs of reverse shock. If you want to use this, set fixedRSFSratio = TRUE in beginning of mainFit.py.
-        self.const_names = np.array(['epsilonLog','epsilonRSLog','epsiloneLog','epsilonpLog','epsilone3Log','epsilonp3Log','E0log','nCMLog','A0Log','s','R_ISM_log','Gamma0log','eBlog','eB3log','p','logt0','theta0','alpha','z','tprompt_log'])
+
+
+        self.const_names = np.array(['epsilonLog','epsilonRSLog','epsiloneLog','epsilonpLog','epsilone3Log','epsilonp3Log','E0log','nCMLog','A0Log','s','R_ISM_log','Gamma0log','eBlog','eB3log','p','logt0','theta0','alpha','tprompt_log','pRS','z'])
 
 
         #return epsilonLog,epsiloneLog,epsilonpLog,epsilone3Log,epsilonp3Log,E0,nCMLog,A0Log,s,R_ISM,Gamma0log,eB,eB3,p,logt0,theta0,alpha,tN,logrphoto,Tprim0,N0,tprompt_log,pRS,R0_Clog,N_Clog,t_outflow_log,Ctheta,GammaClog,z,WV
