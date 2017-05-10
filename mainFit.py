@@ -1728,7 +1728,7 @@ for parI in range(len(UseOp.parametrar)):
 
 if UseOp.runOption == 'plot':
     plotter()
-    raise SystemExit(0)
+    #raise SystemExit(0)
 elif UseOp.runOption == 'read-stats':
     gather_multinest_stats()
     raise SystemExit(0)
