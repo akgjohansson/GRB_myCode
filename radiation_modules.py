@@ -49,7 +49,7 @@ def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas
             P_fac = 1e23 * Dyn.R[elements]**2 * Dyn.thickness_FS[elements] / (Dyn.Gamma[elements] ** 3 * (1-Dyn.beta[elements]*np.cos(Phi))**3)
         
 
-        return P_fac * eats_function(ModVar , UseOp , Rad , nu[1:-1] , elements , where_slow_cooling , where_fast_cooling , kappas)
+        return P_fac * eats_function(ModVar , UseOp , Rad , nu[1:-1] , elements , where_slow_cooling , where_fast_cooling , kappas , RS)
     else:
         regions = ['edge' , 'front']
         out = np.zeros(2)
@@ -92,16 +92,8 @@ def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas
                 out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu_now , None , [] , [element] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu_now , None , [] , [element+1] , kappas , RS , True) , region,'log')
             else:
                 raise NameError('variable regions is not properly used!')
-            """
-            elif region == 'front':
-                P_b_fac = 1e23 * thickness * InterWeights.interpolator(Dyn.R[first_index]**2 / Dyn.Gamma[first_index]**3 / (1-Dyn.beta[first_index]*np.cos(Phi[0]))**3  ,  Dyn.R[first_index+1]**2 / Dyn.Gamma[first_index+1]**3 / (1-Dyn.beta[first_index+1]*np.cos(Phi[-1]))**3  , region,'log')
-                if slow_cooling:
-                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[-1] , None , [first_index] , [] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[-1] , None , [first_index+1] , [] , kappas , RS , True) , region,'log')
-                elif fast_cooling:
-                    out[i] =  P_b_fac * InterWeights.interpolator(eats_function(ModVar , UseOp , Rad , nu[-1] , None , [] , [first_index] , kappas , RS , True) , eats_function(ModVar , UseOp , Rad , nu[-1] , None , [] , [first_index+1] , kappas , RS , True) , region,'log')
-                else:
-                    raise NameError('variable regions is not properly used!')
-            """
+
+
         return out
                                                         
 def self_absorption(Dyn, ModVar , absCon ,  Rad , NatCon , InterWeights , nuPrim , indeces , RS):

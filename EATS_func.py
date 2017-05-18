@@ -25,12 +25,12 @@ def eats_function(ModVar , UseOp , Rad , nu , elements ,  where_slow_cooling , w
 
 
             if RS:
-                return Rad.PmaxSRS[where_slow_cooling] * ((nu/Rad.numRS[where_slow_cooling])**(kappas.kappa33) + (nu/Rad.numRS[where_slow_cooling])**(kappas.kappa3p))**(kappas.kappa13inv) * (1+(nu/Rad.nucRS[where_slow_cooling])**(kappas.kappa42))**(kappas.kappa14)
+                return Rad.PmaxS_RS[where_slow_cooling] * ((nu/Rad.numRS[where_slow_cooling])**(kappas.kappa33) + (nu/Rad.numRS[where_slow_cooling])**(kappas.kappa3p))**(kappas.kappa13inv) * (1+(nu/Rad.nucRS[where_slow_cooling])**(kappas.kappa42))**(kappas.kappa14)
             else:
                 return Rad.PmaxS[where_slow_cooling] * ((nu/Rad.num[where_slow_cooling])**(kappas.kappa33) + (nu/Rad.num[where_slow_cooling])**(kappas.kappa3p))**(kappas.kappa13inv) * (1+(nu/Rad.nuc[where_slow_cooling])**(kappas.kappa42))**(kappas.kappa14)
         elif len(where_fast_cooling) == 1: ### Fast cooling
             if RS: 
-                return Rad.PmaxFRS[where_fast_cooling] * ((nu/Rad.nucRS[where_fast_cooling])**(kappas.kappa13) + (nu/Rad.nucRS[where_fast_cooling])**(kappas.kappa12)) ** (kappas.kappa11) * (1+(nu/Rad.numRS[where_fast_cooling])**(kappas.kappa2p))**(kappas.kappa12inv)
+                return Rad.PmaxF_RS[where_fast_cooling] * ((nu/Rad.nucRS[where_fast_cooling])**(kappas.kappa13) + (nu/Rad.nucRS[where_fast_cooling])**(kappas.kappa12)) ** (kappas.kappa11) * (1+(nu/Rad.numRS[where_fast_cooling])**(kappas.kappa2p))**(kappas.kappa12inv)
             else: ###Fast cooling, FS
                 return Rad.PmaxF[where_fast_cooling] * ((nu/Rad.nuc[where_fast_cooling])**(kappas.kappa13) + (nu/Rad.nuc[where_fast_cooling])**(kappas.kappa12)) ** (kappas.kappa11) * (1+(nu/Rad.num[where_fast_cooling])**(kappas.kappa2p))**(kappas.kappa12inv)
         else:
@@ -43,9 +43,9 @@ def eats_function(ModVar , UseOp , Rad , nu , elements ,  where_slow_cooling , w
     
 
     if RS:
-        P_out[where_fast_cooling] = Rad.PmaxFRS[fast_cooling] * ((nu[where_fast_cooling]/Rad.nucRS[fast_cooling])**(kappas.kappa13) + (nu[where_fast_cooling]/Rad.nucRS[fast_cooling])**(kappas.kappa12)) ** (kappas.kappa11) * (1+(nu[where_fast_cooling]/Rad.numRS[fast_cooling])**(kappas.kappa2p))**(kappas.kappa12inv)
+        P_out[where_fast_cooling] = Rad.PmaxF_RS[fast_cooling] * ((nu[where_fast_cooling]/Rad.nucRS[fast_cooling])**(kappas.kappa13) + (nu[where_fast_cooling]/Rad.nucRS[fast_cooling])**(kappas.kappa12)) ** (kappas.kappa11) * (1+(nu[where_fast_cooling]/Rad.numRS[fast_cooling])**(kappas.kappa2p))**(kappas.kappa12inv)
 
-        P_out[where_slow_cooling] =  Rad.PmaxSRS[slow_cooling] * ((nu[where_slow_cooling]/Rad.numRS[slow_cooling])**(kappas.kappa33) + (nu[where_slow_cooling]/Rad.numRS[slow_cooling])**(kappas.kappa3p))**(kappas.kappa13inv) * (1+(nu[where_slow_cooling]/Rad.nucRS[slow_cooling])**(kappas.kappa42))**(kappas.kappa14)
+        P_out[where_slow_cooling] =  Rad.PmaxS_RS[slow_cooling] * ((nu[where_slow_cooling]/Rad.numRS[slow_cooling])**(kappas.kappa33) + (nu[where_slow_cooling]/Rad.numRS[slow_cooling])**(kappas.kappa3p))**(kappas.kappa13inv) * (1+(nu[where_slow_cooling]/Rad.nucRS[slow_cooling])**(kappas.kappa42))**(kappas.kappa14)
 
     else:
 
