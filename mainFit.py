@@ -1567,17 +1567,20 @@ if nArgs > 1:
         elif inputArg[0] == 'load':
             print "Loading parameters.txt"
             if inputArg[1] == 'output': #Loading the output file parameters.txt created in the lowest-chi2 routine
-                try:
+                if True:
+                #try:
                     os.path.isfile('parameters.txt')
                     ladda = open('parameters.txt')
                     loadInText = ladda.read().split('\n')
                     ladda.close()
 #                    constants = np.zeros(constantsLength)
                     for j in range(constantsLength):
+                        print constantsLength
+                        
                         ModVar.new_value(j , float(loadInText[j].split('=')[1]))
                     surfRingsOut = int(loadInText[constantsLength].split('=')[1])
                     loadInputConstants = False
-                except: print "Could not find file parameters.txt. Loading the options.py file instead"
+                #except: print "Could not find file parameters.txt. Loading the options.py file instead"
             elif inputArg[1] == 'chains':
                 ### Reading best-fit values from chains/1-stats.dat
                 print 'Loading best-fit parameters from MultiNest output'
