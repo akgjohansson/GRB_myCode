@@ -427,9 +427,10 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
 
                     PRSprimTemp = np.zeros(EATSrings_RS)
-                    PRSprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , False )
-                    PRSprimTemp[0] , PRSprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , False , True , InterWeights , last_index , first_index)
-                    PprimTemp[0] , PprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi , intermid_ind , Kappas, False , False , InterWeights , last_index , first_index)
+                    PRSprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , True )
+                    PRSprimTemp[0] , PRSprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , False , InterWeights , last_index , first_index)
+
+                    
 
                     if opticalDepth:
                         tauRS = tauFS + self_absorption(Dyn , ModVar , selfAbsRS , Rad , NatCon , InterWeights , nuPrim[where_RS] , intermid_ind_RS , True)

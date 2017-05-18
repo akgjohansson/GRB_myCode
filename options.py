@@ -27,7 +27,7 @@ class model_variables:
         self.tprompt_log = 3.         #Duration time of prompt phase. Needed for the reverse shock. Input time is observer frame, the module returns the progenitor frame time. Note from 29/1 -14
         self.pRS = 2.05          #Ratio between fixed reverse shock and forward shock microphysical ceofficients. Assumes coeffs of forward shock to set coeffs of reverse shock. If you want to use this, set fixedRSFSratio = TRUE in beginning of mainFit.py.
 
-        
+
         self.const_names = np.array(['epsilonLog','epsilonRSLog','epsiloneLog','epsilonpLog','epsilone3Log','epsilonp3Log','E0log','nCMLog','A0Log','s','R_ISM_log','Gamma0log','eBlog','eB3log','p','logt0','theta0','alpha','tprompt_log','pRS','z'])
 
 
@@ -36,18 +36,11 @@ class model_variables:
     ### Method to change values of objects in ModVar class
     def new_value(self, index , new_value):
 
-        #try:
-        if True:
-            try:
-                for i in range(len(index)):### If index is not an array, this will fail and go into except
-                    exec('self.%s = new_value[i]'%self.const_names[index[i]])
-            except: ### index is an integer, not an array
-                exec('self.%s = new_value'%self.const_names[index])
-                print len(self.const_names)
-                print self.const_names
-                
-        else:
-        #except: ### input index is not an array
+        try:
+        #if True:
+            for i in range(len(index)):### If index is not an array, this will fail and go into except
+                exec('self.%s = new_value[i]'%self.const_names[index[i]])
+        except: ### input index is not an array
             print 'Bad value!'
             print 'self.%s = new_value[i]'%self.const_names[index[i]]
             raw_input()
@@ -96,7 +89,7 @@ class userOptions:
         self.preferredPlotScale = ['lin','log','lin','log','lin','log','log','lin','lin','log','log','log','log','lin','None','deg','deg','None','None','None','None','lin','lin','log','log','log','deg','log','lin','lin'] #Determines what x-scale the probability plots should have. Parameter preferredScale in mainFit.py determines scale used in fitter
 
         #Dynamics options
-        self.reverseShock = False            #Include a reverse shock component?
+        self.reverseShock = True            #Include a reverse shock component?
         self.exponential_outflow = True        #Ejecta density distribution exponentially (True) or constant (False)?
         self.opticalDepth = True           #Take synchrotron self-absorption optical depth into account? True: yes
         self.fixedRSFSratio = False          #Fixed ratio between the microphysical coefficients esilone,epsilonp,epsilonB and p of the reverse shock and the forward shock?
