@@ -37,14 +37,13 @@ class model_variables:
     def new_value(self, index , new_value):
 
         try:
-        #if True:
+            ### index is a vector
+            
+            
             for i in range(len(index)):### If index is not an array, this will fail and go into except
                 exec('self.%s = new_value[i]'%self.const_names[index[i]])
-        except: ### input index is not an array
-            print 'Bad value!'
-            print 'self.%s = new_value[i]'%self.const_names[index[i]]
-            raw_input()
-            #exec('self.%s = new_value'%self.const_names[i])
+        except: ### index is a scalar
+            exec('self.%s = new_value'%self.const_names[index])
 
     def echo_value(self, index):
         exec('out_value = self.%s'%self.const_names[index])
@@ -89,7 +88,7 @@ class userOptions:
         self.preferredPlotScale = ['lin','log','lin','log','lin','log','log','lin','lin','log','log','log','log','lin','None','deg','deg','None','None','None','None','lin','lin','log','log','log','deg','log','lin','lin'] #Determines what x-scale the probability plots should have. Parameter preferredScale in mainFit.py determines scale used in fitter
 
         #Dynamics options
-        self.reverseShock = True            #Include a reverse shock component?
+        self.reverseShock = False            #Include a reverse shock component?
         self.exponential_outflow = True        #Ejecta density distribution exponentially (True) or constant (False)?
         self.opticalDepth = True           #Take synchrotron self-absorption optical depth into account? True: yes
         self.fixedRSFSratio = False          #Fixed ratio between the microphysical coefficients esilone,epsilonp,epsilonB and p of the reverse shock and the forward shock?
