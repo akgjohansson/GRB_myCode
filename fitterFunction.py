@@ -273,8 +273,20 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 last_index = np.argmin(np.abs((1+ModVar.z)*(Dyn.tburst - Dyn.R*np.cos(total_angle)/NatCon.c) - tobsRed[rimI]))
                             
                 if ((1+ModVar.z)*(Dyn.tburst[last_index] - Dyn.R[last_index]*np.cos(total_angle[last_index])/NatCon.c)) > tobsRed[rimI]:
+                    if last_index != 0: ### There is no point early enough on the EATS to match this time. We reduce total_angle
+                        smallest_angle = tobsRed[rimI] / (1+ModVar.z) - Dyn.tburst
+                        print 'stepping down'
                     last_index -= 1
                 if last_index <= 0:
+                    print last_index
+                    print tobsRed[rimI]
+                    print (1+ModVar.z)*(Dyn.tburst[0] - Dyn.R[0]*np.cos(total_angle[0])/NatCon.c)
+                    print Dyn.tobs[0]
+                    print Dyn.tcomoving[0]
+                    print Dyn.tburst[0]
+                    print Dyn.R[0]
+                    print Dyn.R[0]*np.cos(total_angle[0]) / NatCon.c
+                    print 'total_angle =',total_angle[0]*180/np.pi
                     print 'last_index is smaller or equal to 0!!!'
 
                 tobs_behind = (1+ModVar.z)*(Dyn.tburst[last_index] - Dyn.R[last_index]*np.cos(total_angle[last_index])/NatCon.c)
