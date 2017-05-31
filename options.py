@@ -76,7 +76,7 @@ class userOptions:
         #surfaceRings = 15              #If not using EATS, how many rings should the shock front surface be integrated over?
         self.plotOutput = False              #If running the fitter, and you want to plot the output. Plot: True
 
-        self.gridStart,self.gridEnd,self.gridStep = 12,24,2000          #Start of grid (log10), end of grid (log10), and number of grid points
+        self.gridStart,self.gridEnd,self.gridStep = 8,24,2000          #Start of grid (log10), end of grid (log10), and number of grid points
         self.printProcess = True           #Print the values of the variable values as the fitter is running. Prints when fitter hits a new lowest chi^2
         self.allowPrint = True             #Allow the programme to return prints? For using in cluster, False is recommended to avoid obscene logs. Crucial messages will be printed if printCrucial == True, no matter this value
         self.printCrucial = True            #Print crucial messages
@@ -88,7 +88,7 @@ class userOptions:
         self.preferredPlotScale = ['lin','log','lin','log','lin','log','log','lin','lin','log','log','log','log','lin','None','deg','deg','None','None','None','None','lin','lin','log','log','log','deg','log','lin','lin'] #Determines what x-scale the probability plots should have. Parameter preferredScale in mainFit.py determines scale used in fitter
 
         #Dynamics options
-        self.reverseShock = False            #Include a reverse shock component?
+        self.reverseShock = True            #Include a reverse shock component?
         self.exponential_outflow = True        #Ejecta density distribution exponentially (True) or constant (False)?
         self.opticalDepth = True           #Take synchrotron self-absorption optical depth into account? True: yes
         self.fixedRSFSratio = False          #Fixed ratio between the microphysical coefficients esilone,epsilonp,epsilonB and p of the reverse shock and the forward shock?
