@@ -15,8 +15,8 @@ class rad_var:
 
 
             gamToNuFactorRS = NatCon.qe * Dyn.BRS / 2 / np.pi / NatCon.c / NatCon.me
-            where_nucRS_finite = np.isfinite(Dyn.gammacRS)
-            where_nucRS_inf = np.isinf(Dyn.gammacRS)
+            where_nucRS_finite = (Dyn.gammacRS < 1e100)
+            where_nucRS_inf = np.where(where_nucRS_finite == 0)
             self.nucRS = np.zeros(Dyn.RS_elements_upper)
             self.nucRS[where_nucRS_finite] = Dyn.gammacRS[where_nucRS_finite]**2 * gamToNuFactorRS[where_nucRS_finite]
             self.nucRS[where_nucRS_inf] = float('inf')
@@ -228,7 +228,11 @@ class weights:
         if UseOp.reverseShock:
             self.BRS_edge = self.interpolator(Dyn.BRS[last_index] , Dyn.BRS[last_index+1] , 'edge','log')
             self.numRS_edge = self.interpolator(Rad.numRS[last_index] , Rad.numRS[last_index+1] , 'edge','log')
-            self.nucRS_edge = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'edge','log')
+            
+            if (np.isinf(Rad.nucRS[last_index]) | np.isinf(Rad.nucRS[last_index+1])): ### Safety check to avoid overflow from infinite cooling frequencies
+                self.nucRS_edge = float('inf')
+            else:
+                self.nucRS_edge = self.interpolator(Rad.nucRS[last_index] , Rad.nucRS[last_index+1] , 'edge','log')
             self.rho4_edge = self.interpolator(Dyn.rho4[last_index] , Dyn.rho4[last_index+1] , 'edge','log')            
             self.gammac_RS_edge = self.interpolator(Dyn.gammacRS[last_index] , Dyn.gammacRS[last_index+1] , 'edge','log')
             self.gamma_min_RS_edge = self.interpolator(Dyn.gamma_min_RS[last_index] , Dyn.gamma_min_RS[last_index+1] , 'edge','log')
@@ -253,7 +257,10 @@ class weights:
             self.rho4_front = self.interpolator(Dyn.rho4[first_index] , Dyn.rho4[first_index+1] , 'front','log')            
             self.BRS_front = self.interpolator(Dyn.BRS[first_index] , Dyn.BRS[first_index+1] , 'front','log')
             self.numRS_front = self.interpolator(Rad.numRS[first_index] , Rad.numRS[first_index+1] , 'front','log')
-            self.nucRS_front = self.interpolator(Rad.nucRS[first_index] , Rad.nucRS[first_index+1] , 'front','log')
+            if (np.isinf(Rad.nucRS[first_index]) | np.isinf(Rad.nucRS[first_index+1])):  ### Safety check to avoid overflow from infinite cooling frequencies
+                self.nucRS_front = float('inf')
+            else:
+                self.nucRS_front = self.interpolator(Rad.nucRS[first_index] , Rad.nucRS[first_index+1] , 'front','log')
             self.gammac_RS_front = self.interpolator(Dyn.gammacRS[first_index] , Dyn.gammacRS[first_index+1] , 'front','log')
             self.gamma_min_RS_front = self.interpolator(Dyn.gamma_min_RS[first_index] , Dyn.gamma_min_RS[first_index+1] , 'front','log')
             self.thickness_RS_front = self.interpolator(Dyn.thickness_RS[first_index] , Dyn.thickness_RS[first_index+1] , 'front','log')
@@ -265,12 +272,20 @@ class weights:
             if region == 'front':
                 return np.exp(lower + (upper - lower) * self.front_connector_log)
             elif region == 'edge':
+                if np.sum(np.isnan(np.exp(lower + (upper - lower) * self.edge_connector_log))):
+                    print lower
+                    print upper
+                    print self.edge_connector_log
+                    print 'isnan somewhere!'
+                    raise NameError("exiting")
                 return np.exp(lower + (upper - lower) * self.edge_connector_log)
             else:
                 print region
                 raise NameError('Something wrong! This else should not be entered')
         else:
             if region == 'front':
+                if np.sum(np.isnan(lower + (upper - lower) * self.front_connector_lin)) != 0:
+                    print 'is somewhere!'
                 return lower + (upper - lower) * self.front_connector_lin
             elif region == 'edge':
                 return lower + (upper - lower) * self.edge_connector_lin
