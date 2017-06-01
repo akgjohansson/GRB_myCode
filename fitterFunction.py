@@ -166,6 +166,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
     if UseOp.reverseShock:
         tobs_RS_cutoff = Dyn.tobs[Dyn.RS_elements_upper - 1]
         Rad = rad_var(Dyn , ModVar , UseOp , NatCon , RadCon , RadConRS)
+        RS_in_EATS = True
     else:
         Rad = rad_var(Dyn , ModVar , UseOp , NatCon , RadCon)
 
@@ -305,25 +306,31 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
                 ### Same for RS
                 if UseOp.reverseShock:
-                    where_RS = np.where(Dyn.tobs[intermid_ind] <= tobs_RS_cutoff) ### Finds what rings on the EATS has an RS counter part.
+                    where_RS = np.where(Dyn.tobs[intermid_ind] <= tobs_RS_cutoff)[0] ### Finds what rings on the EATS has an RS counter part.
                     intermid_ind_RS = intermid_ind[where_RS] ### Finds what indeces has an RS counter part.
 
 
                     ### Check if we hit RS cutoff
-                    print 'max intermid =',np.max(intermid_ind_RS)
-                    print intermid_ind_RS[-1]
-                    if np.max(intermid_ind_RS) == (Dyn.RS_elements_upper-1):
-                        
-                        intermid_ind_RS = intermid_ind_RS[:-1]
-                        raw_input('large element!')
+                    try:
+                        if np.max(intermid_ind_RS) == (Dyn.RS_elements_upper-1):
+                            intermid_ind_RS = intermid_ind_RS[:-1]
+                            where_RS = where_RS[:-1]
 
-                    EATSrings_RS = len(intermid_ind_RS) + 2                      
+                        EATSrings_RS = len(intermid_ind_RS) + 2                      
 
-                    ### innermost and edge elements of RS
-                    first_index_RS = intermid_ind_RS[-1]
-                    print 'first_index_RS =',first_index_RS
+                        ### innermost and edge elements of RS
+                        first_index_RS = intermid_ind_RS[-1]
+                        print 'first_index_RS =',first_index_RS
                     
-                    last_index_RS = intermid_ind_RS[0] - 1
+                        last_index_RS = intermid_ind_RS[0] - 1
+
+
+                    except: ### len(intermid_ind_RS) = 0
+                        RS_in_EATS = False
+                        print 'no RS'
+                        print where_RS
+                        pass
+
 
 
                 ### Weights for interpolating the front point and the edge point
@@ -441,18 +448,23 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                         raw_input('hold it!')
                     ### any lower tau will give tau factor 1
                     PprimTemp *= tau_factor
-                if UseOp.reverseShock:
+                if UseOp.reverseShock and RS_in_EATS:
                     print 'len(intermid_ind) =',len(intermid_ind)
                     print 'len(intermid_ind_RS) =',len(intermid_ind_RS)
                     print len(nuPrim[where_RS])
                     PRSprimTemp = np.zeros(EATSrings_RS)
                     PRSprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , True )
-                    PRSprimTemp[0] , PRSprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , False , InterWeights , last_index , first_index)
+                    PRSprimTemp[0] , PRSprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , False , InterWeights , last_index_RS , first_index_RS)
 
                     
 
                     if UseOp.opticalDepth:
-                        tauRS = tauFS + self_absorption(Dyn , ModVar , selfAbsRS , Rad , NatCon , InterWeights , nuPrim[where_RS] , intermid_ind_RS , True)
+                        tauRS_component = self_absorption(Dyn , ModVar , selfAbsRS , Rad , NatCon , InterWeights , nuPrim[where_RS] , intermid_ind_RS , True)
+                        print tauRS_component.shape
+                        print tauFS.shape
+                        print np.max(where_RS)
+                        print np.shape(tauFS[:where_RS[-1]+3])
+                        tauRS = tauFS[:where_RS[-1]+3] + tauRS_component
                         PRSprimTemp *= (1-np.exp(-tauRS))/tauRS
 
                     #PRSprimTemp[where_RS] = radiation_function(Dyn , numRS , nucRS , nuPrim , beta , Phi , pRS , PRSmaxF , PRSmaxS)
@@ -528,8 +540,9 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 
                 #angle_integ = (np.cos(xAngInt[:-1]) - np.cos(xAngInt[1:])) * phiInter   #Angular integration segments
                 if not Plot_Exceptions.RS_only and not Plot_Exceptions.FS_only:
-                    if UseOp.reverseShock:
-                        PprimTot = PprimTemp + PRSprimTemp
+                    if UseOp.reverseShock and RS_in_EATS:
+                        PprimTot = np.copy(PprimTemp)
+                        PprimTot[:where_RS[-1]+3] += PRSprimTemp
                     else:
                         PprimTot = PprimTemp
                 elif Plot_Exceptions.FS_only or not UseOp.reverseShock:
@@ -551,8 +564,8 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 if UseOp.runOption == 'LC' and not UseOp.createMock:
                     if not Plot_Exceptions.RS_only:
                         Flux.FFS[nuIte,rimI] = np.trapz(PprimTemp * phiInter , Phi) * distance_factor
-                    if UseOp.reverseShock and not Plot_Exceptions.FS_only:
-                        Flux.FRS[nuIte,rimI] = np.trapz(PRSprimTemp * phiInter , Phi) * distance_factor
+                    if UseOp.reverseShock and not Plot_Exceptions.FS_only and RS_in_EATS:
+                        Flux.FRS[nuIte,rimI] = np.trapz(PRSprimTemp * phiInter[:where_RS[-1]+3] , Phi[:where_RS[-1]+3]) * distance_factor
                     Flux.Ftotal[nuIte,rimI] = np.copy(F[rimI])
 
         if UseOp.plotComponents and UseOp.runOption == 'LC':

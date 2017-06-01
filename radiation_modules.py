@@ -63,7 +63,12 @@ def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas
                 nu_now = nu[-1]
                 Phi_now = Phi[-1]
             if RS:
-                num = InterWeights.interpolator(Rad.numRS[element],Rad.numRS[element+1],region,'log')
+                try:
+                    num = InterWeights.interpolator(Rad.numRS[element],Rad.numRS[element+1],region,'log')
+                except:
+                    print element
+                    print len(Rad.numRS)
+                    raise NameError("slutar")
                 if np.isinf(Rad.nucRS[element]) | np.isinf(Rad.nucRS[element+1]) :  ### Infinite gammac
                     nuc = float('inf')
                 else: ### Finite
