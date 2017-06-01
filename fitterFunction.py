@@ -286,9 +286,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 ### Now we want to create an array with obs times of all points on the EATS. Then we integrate using trapzoidal rule
                 intermid_ind = np.arange(last_index+1,first_index+1) ### intermediate indeces, ranging from last_index+1 to first_index (all indeces inside the EATS)
                 
-                ### Weights for interpolating the front point and the edge point
-                InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before , first_index , last_index , onePzFreq)
-                                       
+      
 
                 ### Angle Phi is defined from setting
                 ### tobs = (1+z)*(tburst-R*cos(Phi)/c)
@@ -309,11 +307,31 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 if UseOp.reverseShock:
                     where_RS = np.where(Dyn.tobs[intermid_ind] <= tobs_RS_cutoff) ### Finds what rings on the EATS has an RS counter part.
                     intermid_ind_RS = intermid_ind[where_RS] ### Finds what indeces has an RS counter part.
-                    EATSrings_RS = len(intermid_ind_RS) + 2
+
+
+                    ### Check if we hit RS cutoff
+                    print 'max intermid =',np.max(intermid_ind_RS)
+                    print intermid_ind_RS[-1]
+                    if np.max(intermid_ind_RS) == (Dyn.RS_elements_upper-1):
+                        
+                        intermid_ind_RS = intermid_ind_RS[:-1]
+                        raw_input('large element!')
+
+                    EATSrings_RS = len(intermid_ind_RS) + 2                      
 
                     ### innermost and edge elements of RS
                     first_index_RS = intermid_ind_RS[-1]
+                    print 'first_index_RS =',first_index_RS
+                    
                     last_index_RS = intermid_ind_RS[0] - 1
+
+
+                ### Weights for interpolating the front point and the edge point
+                if UseOp.reverseShock:
+                    InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before , first_index , last_index , onePzFreq , first_index_RS , last_index_RS)
+                else:
+                    InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before , first_index , last_index , onePzFreq)    
+
 
                 ### Setting array containing angle from LoS to EATS rings
                 Phi = np.zeros(EATSrings)
@@ -378,10 +396,10 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 nuPrim[0] = InterWeights.nuPrim_edge
 
                 nuPrim[-1] = InterWeights.nuPrim_front
-
+                
                 PprimTemp = np.zeros(EATSrings)
                 PprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi[1:-1] , intermid_ind , Kappas, False , True)
-                PprimTemp[0] , PprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi , intermid_ind , Kappas, False , False , InterWeights , last_index , first_index)
+                PprimTemp[0] , PprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim , Phi , intermid_ind , Kappas, False , False , InterWeights , last_index , first_index) ### Interpolating edge points
 
                 """
                 if (tobsRed[rimI] > 86400*84) and (freqArr > 1e13):
@@ -424,15 +442,16 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     ### any lower tau will give tau factor 1
                     PprimTemp *= tau_factor
                 if UseOp.reverseShock:
-
-
+                    print 'len(intermid_ind) =',len(intermid_ind)
+                    print 'len(intermid_ind_RS) =',len(intermid_ind_RS)
+                    print len(nuPrim[where_RS])
                     PRSprimTemp = np.zeros(EATSrings_RS)
                     PRSprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , True )
                     PRSprimTemp[0] , PRSprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , False , InterWeights , last_index , first_index)
 
                     
 
-                    if opticalDepth:
+                    if UseOp.opticalDepth:
                         tauRS = tauFS + self_absorption(Dyn , ModVar , selfAbsRS , Rad , NatCon , InterWeights , nuPrim[where_RS] , intermid_ind_RS , True)
                         PRSprimTemp *= (1-np.exp(-tauRS))/tauRS
 
