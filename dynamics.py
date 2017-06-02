@@ -315,6 +315,10 @@ def dyn(R0,ModVar,UseOp,tobsEnd,tol):
     ### Calculating gamma_min ###
     gamma_min = (ModVar.p-2)/(ModVar.p-1)*(1+mp/me*ModVar.epsilone*(out[:i+1,2]-1))
     gamma_min[np.where(gamma_min<1)] = 1.
+    if UseOp.reverseShock:
+        ### Calculating gamma_min_RS ###
+        gamma_min_RS = (ModVar.pRS-2)/(ModVar.pRS-1)*(1+mp/me*ModVar.epsilone3*gamma43_minus_one[:i+1])
+
     if UseOp.save_params:
 
         os.system('rm Parameters/*')
@@ -336,8 +340,6 @@ def dyn(R0,ModVar,UseOp,tobsEnd,tol):
         np.savetxt('Parameters/theta.txt' , out[:i+1,5])
         np.savetxt('Parameters/rho.txt' , rho[:i+1])
         if UseOp.reverseShock:
-            ### Calculating gamma_min_RS ###
-            gamma_min_RS = (ModVar.pRS-2)/(ModVar.pRS-1)*(1+mp/me*ModVar.epsilone3*gamma43_minus_one[:i+1])
 
             np.savetxt('Parameters/dM3dR.txt',(out[1:i+1,13]-out[:i,13])/(R[1:i+1] - R[:i]))
             np.savetxt('Parameters/M3.txt',out[:i+1,13])
