@@ -63,12 +63,7 @@ def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas
                 nu_now = nu[-1]
                 Phi_now = Phi[-1]
             if RS:
-                try:
-                    num = InterWeights.interpolator(Rad.numRS[element],Rad.numRS[element+1],region,'log')
-                except:
-                    print element
-                    print len(Rad.numRS)
-                    raise NameError("slutar")
+                num = InterWeights.interpolator(Rad.numRS[element],Rad.numRS[element+1],region,'log')
                 if np.isinf(Rad.nucRS[element]) | np.isinf(Rad.nucRS[element+1]) :  ### Infinite gammac
                     nuc = float('inf')
                 else: ### Finite
@@ -262,16 +257,7 @@ class weights:
         self.gamma_min_front = self.interpolator(Dyn.gamma_min[first_index] , Dyn.gamma_min[first_index+1] , 'front','log')
         self.nuPrim_front = onePzFreq * self.Gamma_front * (1-self.beta_front)
         if UseOp.reverseShock:
-            try:
-                self.rho4_front = self.interpolator(Dyn.rho4[first_index_RS] , Dyn.rho4[first_index_RS+1] , 'front','log')            
-            except:
-                print first_index_RS
-                print first_index_RS+1
-                print (len(Dyn.rho4))
-                print len(Dyn.rho)
-                print Dyn.RS_elements_upper
-                raise NameError("slutar")
-
+            self.rho4_front = self.interpolator(Dyn.rho4[first_index_RS] , Dyn.rho4[first_index_RS+1] , 'front','log')            
 
             self.BRS_front = self.interpolator(Dyn.BRS[first_index_RS] , Dyn.BRS[first_index_RS+1] , 'front','log')
             self.numRS_front = self.interpolator(Rad.numRS[first_index_RS] , Rad.numRS[first_index_RS+1] , 'front','log')

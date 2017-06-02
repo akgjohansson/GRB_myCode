@@ -43,20 +43,11 @@ def eats_function(ModVar , UseOp , Rad , nu , elements ,  where_slow_cooling , w
     
 
     if RS:
-        try:
-            P_out[where_fast_cooling] = Rad.PmaxF_RS[fast_cooling] * ((nu[where_fast_cooling]/Rad.nucRS[fast_cooling])**(kappas.kappa13) + (nu[where_fast_cooling]/Rad.nucRS[fast_cooling])**(kappas.kappa12)) ** (kappas.kappa11) * (1+(nu[where_fast_cooling]/Rad.numRS[fast_cooling])**(kappas.kappa2p))**(kappas.kappa12inv)
+
+        P_out[where_fast_cooling] = Rad.PmaxF_RS[fast_cooling] * ((nu[where_fast_cooling]/Rad.nucRS[fast_cooling])**(kappas.kappa13) + (nu[where_fast_cooling]/Rad.nucRS[fast_cooling])**(kappas.kappa12)) ** (kappas.kappa11) * (1+(nu[where_fast_cooling]/Rad.numRS[fast_cooling])**(kappas.kappa2p))**(kappas.kappa12inv)
 
 
-            P_out[where_slow_cooling] = Rad.PmaxS_RS[slow_cooling] * ((nu[where_slow_cooling]/Rad.numRS[slow_cooling])**(kappas.kappa33) + (nu[where_slow_cooling]/Rad.numRS[slow_cooling])**(kappas.kappa3p))**(kappas.kappa13inv) * (1+(nu[where_slow_cooling]/Rad.nucRS[slow_cooling])**(kappas.kappa42))**(kappas.kappa14)
-        except:
-            print where_fast_cooling
-            print len(where_fast_cooling)
-            print len(where_slow_cooling)
-            print np.sum(where_fast_cooling)
-            print len(P_out)
-            print len(nu)
-            raw_input("holding")
-            raise NameError("slutar")
+        P_out[where_slow_cooling] = Rad.PmaxS_RS[slow_cooling] * ((nu[where_slow_cooling]/Rad.numRS[slow_cooling])**(kappas.kappa33) + (nu[where_slow_cooling]/Rad.numRS[slow_cooling])**(kappas.kappa3p))**(kappas.kappa13inv) * (1+(nu[where_slow_cooling]/Rad.nucRS[slow_cooling])**(kappas.kappa42))**(kappas.kappa14)
 
     else:
 
