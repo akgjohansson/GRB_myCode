@@ -569,9 +569,6 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 plt.plot(tobsRed/PlotDetails.scalePlotTime[UseOp.daysOrSec] , Flux.FFS[nuIte] * PlotDetails.scaleFluxAxis[UseOp.fluxAxis] , '%s--'%PlotDetails.colourCycle[nuIte])
             if UseOp.reverseShock:
                 if not Plot_Exceptions.FS_only:
-                    print 'plotting'
-                    print Flux.FRS[nuIte]
-                    print PlotDetails.colourCycle[nuIte]
                     plt.plot(tobsRed/PlotDetails.scalePlotTime[UseOp.daysOrSec] , Flux.FRS[nuIte] * PlotDetails.scaleFluxAxis[UseOp.fluxAxis] , '%s:'%PlotDetails.colourCycle[nuIte])
 
 
