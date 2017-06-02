@@ -1577,7 +1577,6 @@ if nArgs > 1:
                     ladda.close()
 #                    constants = np.zeros(constantsLength)
                     for j in range(constantsLength):
-                        print constantsLength
                         
                         ModVar.new_value(j , float(loadInText[j].split('=')[1]))
                     surfRingsOut = int(loadInText[constantsLength].split('=')[1])

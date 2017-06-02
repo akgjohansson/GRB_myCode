@@ -166,7 +166,6 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
     if UseOp.reverseShock:
         tobs_RS_cutoff = Dyn.tobs[Dyn.RS_elements_upper - 1]
         Rad = rad_var(Dyn , ModVar , UseOp , NatCon , RadCon , RadConRS)
-        RS_in_EATS = True
     else:
         Rad = rad_var(Dyn , ModVar , UseOp , NatCon , RadCon)
 
@@ -215,7 +214,9 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
             
             F = np.zeros(EATSsteps)
             
-            if UseOp.reverseShock: PRSprim = np.zeros(EATSsteps)
+            if UseOp.reverseShock: 
+                PRSprim = np.zeros(EATSsteps)
+                RS_in_EATS = True
             if UseOp.thermalComp: 
                 thermal_component = np.zeros(EATSsteps)
 
@@ -320,16 +321,12 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
                         ### innermost and edge elements of RS
                         first_index_RS = intermid_ind_RS[-1]
-                        print 'first_index_RS =',first_index_RS
                     
                         last_index_RS = intermid_ind_RS[0] - 1
 
 
                     except: ### len(intermid_ind_RS) = 0
                         RS_in_EATS = False
-                        print 'no RS'
-                        print where_RS
-                        pass
 
 
 
@@ -449,9 +446,6 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     ### any lower tau will give tau factor 1
                     PprimTemp *= tau_factor
                 if UseOp.reverseShock and RS_in_EATS:
-                    print 'len(intermid_ind) =',len(intermid_ind)
-                    print 'len(intermid_ind_RS) =',len(intermid_ind_RS)
-                    print len(nuPrim[where_RS])
                     PRSprimTemp = np.zeros(EATSrings_RS)
                     PRSprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , True )
                     PRSprimTemp[0] , PRSprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , False , InterWeights , last_index_RS , first_index_RS)
@@ -460,10 +454,6 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
                     if UseOp.opticalDepth:
                         tauRS_component = self_absorption(Dyn , ModVar , selfAbsRS , Rad , NatCon , InterWeights , nuPrim[where_RS] , intermid_ind_RS , True)
-                        print tauRS_component.shape
-                        print tauFS.shape
-                        print np.max(where_RS)
-                        print np.shape(tauFS[:where_RS[-1]+3])
                         tauRS = tauFS[:where_RS[-1]+3] + tauRS_component
                         PRSprimTemp *= (1-np.exp(-tauRS))/tauRS
 
@@ -543,12 +533,18 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     if UseOp.reverseShock and RS_in_EATS:
                         PprimTot = np.copy(PprimTemp)
                         PprimTot[:where_RS[-1]+3] += PRSprimTemp
+
                     else:
                         PprimTot = PprimTemp
+
                 elif Plot_Exceptions.FS_only or not UseOp.reverseShock:
                     PprimTot = PprimTemp
                 elif Plot_Exceptions.RS_only:
-                    PprimTot = PRSprimTemp
+                    PprimTot = np.zeros(EATSrings)
+                    if RS_in_EATS:
+                        PprimTot[:where_RS[-1]+3] = PRSprimTemp
+                    
+                        
                 """
                 if (tobsRed[rimI] > 84*86400 ) and (freqArr < 1e10):
                     print tobsRed[rimI] / 86400
@@ -565,6 +561,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     if not Plot_Exceptions.RS_only:
                         Flux.FFS[nuIte,rimI] = np.trapz(PprimTemp * phiInter , Phi) * distance_factor
                     if UseOp.reverseShock and not Plot_Exceptions.FS_only and RS_in_EATS:
+                        print 'storing here'
                         Flux.FRS[nuIte,rimI] = np.trapz(PRSprimTemp * phiInter[:where_RS[-1]+3] , Phi[:where_RS[-1]+3]) * distance_factor
                     Flux.Ftotal[nuIte,rimI] = np.copy(F[rimI])
 
@@ -573,6 +570,9 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 plt.plot(tobsRed/PlotDetails.scalePlotTime[UseOp.daysOrSec] , Flux.FFS[nuIte] * PlotDetails.scaleFluxAxis[UseOp.fluxAxis] , '%s--'%PlotDetails.colourCycle[nuIte])
             if UseOp.reverseShock:
                 if not Plot_Exceptions.FS_only:
+                    print 'plotting'
+                    print Flux.FRS[nuIte]
+                    print PlotDetails.colourCycle[nuIte]
                     plt.plot(tobsRed/PlotDetails.scalePlotTime[UseOp.daysOrSec] , Flux.FRS[nuIte] * PlotDetails.scaleFluxAxis[UseOp.fluxAxis] , '%s:'%PlotDetails.colourCycle[nuIte])
 
 
