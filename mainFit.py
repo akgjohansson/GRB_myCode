@@ -43,11 +43,12 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
     
     if (UseOp.runOption == 'LC'): 
         
-        lightcurve,startJetBreak,endJetBreak,tempGrid = modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,iterationLength,numberOfEmpties,numberOfPoints,np.sum(UseOp.parametrar),Plot_Exceptions,plot_SED)
+        lightcurve,startJetBreak,endJetBreak,tempGrid,Flux = modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,iterationLength,numberOfEmpties,numberOfPoints,np.sum(UseOp.parametrar),Plot_Exceptions,plot_SED)
+        global Flux
         endTime = time.time()
         print "Timeuse: %f s"%(endTime-startTime)
         return lightcurve , tempGrid
-
+        
 
     ### Sampler
     elif UseOp.runOption == 'fit': 
@@ -55,7 +56,7 @@ def logLikelihood(cube,ndims,nparam,cm_FdataInput=None,cm_tdata=None,cm_errorbar
         ### Setting number of rings in EATS integrator. The total number of rings in integrator is dependent on theta0
         surfRingsOut = 50
 
-        chi2 , _,_ = modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,iterationLength,numberOfEmpties,numberOfPoints,np.sum(UseOp.parametrar),Plot_Exceptions)
+        chi2 , _,_,_ = modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,iterationLength,numberOfEmpties,numberOfPoints,np.sum(UseOp.parametrar),Plot_Exceptions)
 
         if UseOp.printProcess & UseOp.allowPrint:
 
@@ -2571,7 +2572,7 @@ def plot_area_func():
                     
                 runOption_temp = np.copy(UseOp.runOption)
                 UseOp.runOption = 'one-sigma'
-                lightcurve_sigma,hej,hej,sigmaTempGrid = modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,iterationLength,numberOfEmpties,UseOp.numberOfPoints,np.sum(UseOp.parametrar),Plot_Exceptions,Plot_SED)
+                lightcurve_sigma,hej,hej,sigmaTempGrid,Flux = modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,iterationLength,numberOfEmpties,UseOp.numberOfPoints,np.sum(UseOp.parametrar),Plot_Exceptions,Plot_SED)
                 UseOp.runOption = np.copy(runOption_temp)
 
                 if sigma_LC == 0:
@@ -2651,7 +2652,7 @@ def lightcurve_production(freq,UseOp,numberOfEmpties,FdataInput,tdata,errorbarIn
     
 
 
-    ### Plotting the lightcurves
+    ### Getting the lightcurves
 
     if not print_read:    # If this is false, the user want's to read the printed data and plot it
         if UseOp.createMock:lightcurve , tempGrid = logLikelihood([],[],[],FdataInput,tdata,errorbarInput,numberOfEmpties)
@@ -2997,7 +2998,14 @@ def lightcurve_production(freq,UseOp,numberOfEmpties,FdataInput,tdata,errorbarIn
             
             if (not print_read) and  (not UseOp.createMock) and (not plot_SED):  ### Plotting LC
                 plt.plot(tempGrid[i]/scalePlotTime[UseOp.daysOrSec],lightcurve[i] * scaleFluxAxis[UseOp.fluxAxis],colourCycle[i%len(colourCycle)])
-
+                """
+                if UseOp.reverseShock:
+                    plt.plot(tempGrid[i]/scalePlotTime[UseOp.daysOrSec] , Flux.FRS[i] * scaleFluxAxis[UseOp.fluxAxis] , '%s:'%colourCycle[i%len(colourCycle)])
+                    print Flux.FRS[i]
+                    print lightcurve[i]
+                    plt.loglog()
+                    plt.show()
+                """
             if not plot_SED:
                 if print_read: n_o_e_iterator = np.copy(numberOfEmpties[printFreqOrd[i]])
                 else: n_o_e_iterator = np.copy(numberOfEmpties[i])

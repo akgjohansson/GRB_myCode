@@ -559,10 +559,9 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
                 if UseOp.runOption == 'LC' and not UseOp.createMock:
                     if not Plot_Exceptions.RS_only:
-                        Flux.FFS[nuIte,rimI] = np.trapz(PprimTemp * phiInter , Phi) * distance_factor
+                        Flux.FFS[nuIte,rimI] = np.trapz(PprimTemp * phiInter , np.cos(Phi)) * distance_factor
                     if UseOp.reverseShock and not Plot_Exceptions.FS_only and RS_in_EATS:
-                        print 'storing here'
-                        Flux.FRS[nuIte,rimI] = np.trapz(PRSprimTemp * phiInter[:where_RS[-1]+3] , Phi[:where_RS[-1]+3]) * distance_factor
+                        Flux.FRS[nuIte,rimI] = np.trapz(PRSprimTemp * phiInter[:where_RS[-1]+3] , np.cos(Phi[:where_RS[-1]+3])) * distance_factor
                     Flux.Ftotal[nuIte,rimI] = np.copy(F[rimI])
 
         if UseOp.plotComponents and UseOp.runOption == 'LC':
@@ -688,8 +687,8 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
             
 
-        return lightcurve , startJetBreak , endJetBreak , tobsGrid
+        return lightcurve , startJetBreak , endJetBreak , tobsGrid , Flux
     elif UseOp.runOption == 'one-sigma': 
-        return lightcurve , 0. , 0.  ,  tobsGrid
+        return lightcurve , 0. , 0.  ,  tobsGrid , Flux
     else: 
-        return chi2 , None , None
+        return chi2 , None , None , None
