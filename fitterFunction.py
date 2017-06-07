@@ -327,11 +327,11 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
                     except: ### len(intermid_ind_RS) = 0
                         RS_in_EATS = False
-
+                        
 
 
                 ### Weights for interpolating the front point and the edge point
-                if UseOp.reverseShock:
+                if UseOp.reverseShock and RS_in_EATS:
                     InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before , first_index , last_index , onePzFreq , first_index_RS , last_index_RS)
                 else:
                     InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before , first_index , last_index , onePzFreq)    
