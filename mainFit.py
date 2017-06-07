@@ -831,7 +831,7 @@ def plotter():
 
                 ### Setting xlabels
                 if j_store == (numberOfPlots - 1): ### The last fileset
-                    #preferredPlotScale[whereParam_short[i_store]] == 'lin': 
+                    #UseOp.preferredPlotScale[whereParam_short[i_store]] == 'lin': 
                     xlabel_name[i_store] = latexParamNamesLin[whereParam_short[i_store]]
                     #else: xlabel_name[i_store] = latexParamNames[whereParam_short[i_store]]
 
@@ -934,10 +934,10 @@ def plotter():
                         break
 
             
-            if plot_multinest_gaussian[j_plot_all]: min_xvalue_in,max_xvalue_in = stats_subplot(list_subplots[whereParam_short[i_plot_all]],x_grid,y_grid,plotLine[j_plot_all],plot_multinest_gaussian[j_plot_all],preferredPlotScale[whereParam_short[i_plot_all]],preferredScale[whereParam_short[i_plot_all]],first_plot_set,(j_plot_all==(numberOfPlots-1)) and printInputLine,numberOfPlots,this_param_plot_list,mstats_text,'%s%s'%(gauss_color[j_plot_all],gauss_linetype[j_plot_all]),inputLine_position,midLineColor,paramLimits_corr)
+            if plot_multinest_gaussian[j_plot_all]: min_xvalue_in,max_xvalue_in = stats_subplot(list_subplots[whereParam_short[i_plot_all]],x_grid,y_grid,plotLine[j_plot_all],plot_multinest_gaussian[j_plot_all],UseOp.preferredPlotScale[whereParam_short[i_plot_all]],preferredScale[whereParam_short[i_plot_all]],first_plot_set,(j_plot_all==(numberOfPlots-1)) and printInputLine,numberOfPlots,this_param_plot_list,mstats_text,'%s%s'%(gauss_color[j_plot_all],gauss_linetype[j_plot_all]),inputLine_position,midLineColor,paramLimits_corr)
 
 
-            else: min_xvalue_in,max_xvalue_in = stats_subplot(list_subplots[whereParam_short[i_plot_all]],x_grid,y_grid,plotLine[j_plot_all],plot_multinest_gaussian[j_plot_all],preferredPlotScale[whereParam_short[i_plot_all]],preferredScale[whereParam_short[i_plot_all]],first_plot_set,(j_plot_all==(numberOfPlots-1)) and printInputLine,numberOfPlots,this_param_plot_list,mstats_text,j_plot_all,None,inputLine_position,midLineColor,paramLimits_corr)
+            else: min_xvalue_in,max_xvalue_in = stats_subplot(list_subplots[whereParam_short[i_plot_all]],x_grid,y_grid,plotLine[j_plot_all],plot_multinest_gaussian[j_plot_all],UseOp.preferredPlotScale[whereParam_short[i_plot_all]],preferredScale[whereParam_short[i_plot_all]],first_plot_set,(j_plot_all==(numberOfPlots-1)) and printInputLine,numberOfPlots,this_param_plot_list,mstats_text,j_plot_all,None,inputLine_position,midLineColor,paramLimits_corr)
 
             if j_plot_all == 0: ### First plot, extreme values are assigned as plot limit material
                 min_xvalue[i_plot_all] = np.copy(min_xvalue_in)
