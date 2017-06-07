@@ -22,7 +22,8 @@ class rad_var:
             self.nucRS[where_nucRS_inf] = float('inf')
             self.numRS = Dyn.gamma_min_RS[:Dyn.RS_elements_upper]**2 * gamToNuFactorRS
             self.nucRS[where_nucRS_finite] = Dyn.gammacRS[where_nucRS_finite]**2 * gamToNuFactorRS[where_nucRS_finite]
-        
+
+            self.RS_in_EATS = True ### Keeps track on if RS is completely shut off inside the EATS or not (is changed in fitterFunction.py)
 
 def radiation_function(Dyn , Rad , UseOp , ModVar , nu , Phi , elements , kappas , RS , intermediate,InterWeights=None , last_index=None , first_index=None):
     from EATS_func import eats_function
@@ -228,7 +229,7 @@ class weights:
             
         self.nuPrim_edge = onePzFreq * self.Gamma_edge * (1-self.beta_edge * np.cos(self.Phi_edge))
         
-        if UseOp.reverseShock:
+        if UseOp.reverseShock and Rad.RS_in_EATS:
             self.BRS_edge = self.interpolator(Dyn.BRS[last_index_RS] , Dyn.BRS[last_index_RS+1] , 'edge','log')
             self.numRS_edge = self.interpolator(Rad.numRS[last_index_RS] , Rad.numRS[last_index_RS+1] , 'edge','log')
             
@@ -256,7 +257,7 @@ class weights:
         self.gammac_front = self.interpolator(Dyn.gammac[first_index] , Dyn.gammac[first_index+1] , 'front','log')
         self.gamma_min_front = self.interpolator(Dyn.gamma_min[first_index] , Dyn.gamma_min[first_index+1] , 'front','log')
         self.nuPrim_front = onePzFreq * self.Gamma_front * (1-self.beta_front)
-        if UseOp.reverseShock:
+        if UseOp.reverseShock and Rad.RS_in_EATS:
             self.rho4_front = self.interpolator(Dyn.rho4[first_index_RS] , Dyn.rho4[first_index_RS+1] , 'front','log')            
 
             self.BRS_front = self.interpolator(Dyn.BRS[first_index_RS] , Dyn.BRS[first_index_RS+1] , 'front','log')

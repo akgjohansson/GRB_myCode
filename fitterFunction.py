@@ -216,7 +216,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
             
             if UseOp.reverseShock: 
                 PRSprim = np.zeros(EATSsteps)
-                RS_in_EATS = True
+                Rad.RS_in_EATS = True
             if UseOp.thermalComp: 
                 thermal_component = np.zeros(EATSsteps)
 
@@ -326,12 +326,12 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
 
 
                     except: ### len(intermid_ind_RS) = 0
-                        RS_in_EATS = False
+                        Rad.RS_in_EATS = False
                         
 
 
                 ### Weights for interpolating the front point and the edge point
-                if UseOp.reverseShock and RS_in_EATS:
+                if UseOp.reverseShock and Rad.RS_in_EATS:
                     InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before , first_index , last_index , onePzFreq , first_index_RS , last_index_RS)
                 else:
                     InterWeights = weights(Dyn , UseOp , Rad , ModVar , NatCon , tobsRed[rimI] , tobs_behind , tobs_before , first_index , last_index , onePzFreq)    
@@ -445,7 +445,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                         raw_input('hold it!')
                     ### any lower tau will give tau factor 1
                     PprimTemp *= tau_factor
-                if UseOp.reverseShock and RS_in_EATS:
+                if UseOp.reverseShock and Rad.RS_in_EATS:
                     PRSprimTemp = np.zeros(EATSrings_RS)
                     PRSprimTemp[1:-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , True )
                     PRSprimTemp[0] , PRSprimTemp[-1] = radiation_function(Dyn , Rad , UseOp , ModVar , nuPrim[where_RS] , Phi[where_RS] , intermid_ind_RS , Kappas_RS , True , False , InterWeights , last_index_RS , first_index_RS)
@@ -530,7 +530,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 
                 #angle_integ = (np.cos(xAngInt[:-1]) - np.cos(xAngInt[1:])) * phiInter   #Angular integration segments
                 if not Plot_Exceptions.RS_only and not Plot_Exceptions.FS_only:
-                    if UseOp.reverseShock and RS_in_EATS:
+                    if UseOp.reverseShock and Rad.RS_in_EATS:
                         PprimTot = np.copy(PprimTemp)
                         PprimTot[:where_RS[-1]+3] += PRSprimTemp
 
@@ -541,7 +541,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                     PprimTot = PprimTemp
                 elif Plot_Exceptions.RS_only:
                     PprimTot = np.zeros(EATSrings)
-                    if RS_in_EATS:
+                    if Rad.RS_in_EATS:
                         PprimTot[:where_RS[-1]+3] = PRSprimTemp
                     
                         
@@ -560,7 +560,7 @@ def modelFunc(R,ModVar,UseOp,PlotDetails,tdata,FdataInput,errorbarInput,freq,ite
                 if UseOp.runOption == 'LC' and not UseOp.createMock:
                     if not Plot_Exceptions.RS_only:
                         Flux.FFS[nuIte,rimI] = np.trapz(PprimTemp * phiInter , np.cos(Phi)) * distance_factor
-                    if UseOp.reverseShock and not Plot_Exceptions.FS_only and RS_in_EATS:
+                    if UseOp.reverseShock and not Plot_Exceptions.FS_only and Rad.RS_in_EATS:
                         Flux.FRS[nuIte,rimI] = np.trapz(PRSprimTemp * phiInter[:where_RS[-1]+3] , np.cos(Phi[:where_RS[-1]+3])) * distance_factor
                     Flux.Ftotal[nuIte,rimI] = np.copy(F[rimI])
 
